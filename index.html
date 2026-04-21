@@ -574,6 +574,91 @@
         font-weight: 600;
       }
 
+      .selection-dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .signal-card {
+        padding: 14px 15px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 252, 247, 0.68);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+      }
+
+      .signal-card strong {
+        display: block;
+        margin: 3px 0 6px;
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .signal-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .signal-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .signal-metric {
+        font-family: "Didot", "Bodoni 72", serif;
+        font-size: 26px;
+        line-height: 1;
+      }
+
+      .coverage-track {
+        height: 8px;
+        margin-top: 10px;
+        border-radius: 999px;
+        background: rgba(65, 47, 31, 0.08);
+        overflow: hidden;
+      }
+
+      .coverage-fill {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent-2), #4d948a);
+        transition: width 220ms ease;
+      }
+
+      .jump-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .jump-btn {
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.66);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      }
+
+      .jump-btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(169, 79, 45, 0.28);
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text);
+      }
+
       .sync-indicator {
         display: inline-flex;
         align-items: center;
@@ -847,6 +932,10 @@
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
+        .selection-dashboard {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .method-grid {
           grid-template-columns: 1fr;
         }
@@ -905,6 +994,10 @@
 
         .quick-stats {
           grid-template-columns: 1fr 1fr;
+        }
+
+        .selection-dashboard {
+          grid-template-columns: 1fr;
         }
 
         .inspector-main,
@@ -1062,8 +1155,42 @@
         <section class="workspace">
           <div class="compare-meta">
             <div class="compare-caption" id="filteredSummary">浏览左侧目录，选择一个文件进入双语校对。</div>
-            <div class="sync-indicator" id="syncIndicator">双栏联动已启用</div>
+            <div class="jump-row">
+              <div class="sync-indicator" id="syncIndicator">双栏联动已启用</div>
+              <button class="jump-btn" id="jumpTopBtn" type="button">开头</button>
+              <button class="jump-btn" id="jumpMiddleBtn" type="button">中段</button>
+              <button class="jump-btn" id="jumpBottomBtn" type="button">末尾</button>
+            </div>
           </div>
+
+          <section class="selection-dashboard">
+            <article class="signal-card">
+              <div class="control-label">当前文件</div>
+              <strong id="signalDocTitle">未选择</strong>
+              <span id="signalDocMeta">等待从左侧目录选择文件</span>
+            </article>
+            <article class="signal-card">
+              <div class="control-label">翻译状态</div>
+              <strong id="signalTranslationState">未载入</strong>
+              <span id="signalTranslationMeta">系统会自动判断是否存在 `中文/` 对照版本</span>
+            </article>
+            <article class="signal-card">
+              <div class="control-label">文档密度</div>
+              <div class="signal-meta">
+                <strong id="signalBlockCount" class="signal-metric">0</strong>
+                <span id="signalWordMeta">blocks</span>
+              </div>
+              <span id="signalBlockMeta">选中文件后显示区块数量与正文规模</span>
+            </article>
+            <article class="signal-card">
+              <div class="control-label">厂商进度</div>
+              <strong id="signalCoverageTitle">0 / 0</strong>
+              <span id="signalCoverageMeta">当前厂商还没有统计数据</span>
+              <div class="coverage-track" aria-hidden="true">
+                <div class="coverage-fill" id="signalCoverageFill"></div>
+              </div>
+            </article>
+          </section>
 
           <section class="panes layout-split" id="panes">
             <article class="pane" id="zhPane">
@@ -1261,6 +1388,16 @@
       const filterPendingBtn = document.getElementById("filterPendingBtn");
       const selectedTitle = document.getElementById("selectedTitle");
       const selectedPath = document.getElementById("selectedPath");
+      const signalDocTitle = document.getElementById("signalDocTitle");
+      const signalDocMeta = document.getElementById("signalDocMeta");
+      const signalTranslationState = document.getElementById("signalTranslationState");
+      const signalTranslationMeta = document.getElementById("signalTranslationMeta");
+      const signalBlockCount = document.getElementById("signalBlockCount");
+      const signalWordMeta = document.getElementById("signalWordMeta");
+      const signalBlockMeta = document.getElementById("signalBlockMeta");
+      const signalCoverageTitle = document.getElementById("signalCoverageTitle");
+      const signalCoverageMeta = document.getElementById("signalCoverageMeta");
+      const signalCoverageFill = document.getElementById("signalCoverageFill");
       const zhFileName = document.getElementById("zhFileName");
       const zhStatus = document.getElementById("zhStatus");
       const zhBody = document.getElementById("zhBody");
@@ -1278,6 +1415,9 @@
       const layoutEnFocusBtn = document.getElementById("layoutEnFocusBtn");
       const syncScrollBtn = document.getElementById("syncScrollBtn");
       const syncIndicator = document.getElementById("syncIndicator");
+      const jumpTopBtn = document.getElementById("jumpTopBtn");
+      const jumpMiddleBtn = document.getElementById("jumpMiddleBtn");
+      const jumpBottomBtn = document.getElementById("jumpBottomBtn");
       const mobileToggle = document.getElementById("mobileToggle");
       const protocolWarning = document.getElementById("protocolWarning");
 
@@ -1577,6 +1717,54 @@
         targetStatus.className = `pane-status${tone ? ` is-${tone}` : ""}`;
       }
 
+      function summarizeText(text) {
+        if (!text) return { chars: 0, lines: 0 };
+        return {
+          chars: text.replace(/\s+/g, "").length,
+          lines: text.split(/\r?\n/).filter(Boolean).length
+        };
+      }
+
+      function updateSelectionSignals(record, zhText, enText) {
+        if (!record) return;
+        const companyEntry = MANIFEST.find((item) => item.company === record.company);
+        const total = companyEntry ? companyEntry.records.length : 0;
+        const translated = companyEntry ? companyEntry.records.filter((item) => item.chinese).length : 0;
+        const coverage = total ? Math.round((translated / total) * 100) : 0;
+        const zhBlocks = zhBody.querySelectorAll("[data-block-index]").length;
+        const enBlocks = enBody.querySelectorAll("[data-block-index]").length;
+        const zhSummary = summarizeText(zhText);
+        const enSummary = summarizeText(enText);
+
+        signalDocTitle.textContent = record.name;
+        signalDocMeta.textContent = `${record.company} · ${fileType(record.name)} · ${record.english}`;
+        signalTranslationState.textContent = record.chinese ? "已建立中英对照" : "仅英文原文";
+        signalTranslationMeta.textContent = record.chinese
+          ? `中文 ${zhSummary.chars} 字 / 英文 ${enSummary.chars} 字，适合进入镜像校对。`
+          : "当前文件还没有中文版本，适合用来排查待翻译空缺。";
+        signalBlockCount.textContent = String(Math.max(zhBlocks, enBlocks));
+        signalWordMeta.textContent = `${zhSummary.lines || enSummary.lines} lines`;
+        signalBlockMeta.textContent = record.chinese
+          ? `中文 ${zhBlocks} 块，对照英文 ${enBlocks} 块。`
+          : `英文正文共 ${enBlocks} 个区块，可作为后续翻译模板。`;
+        signalCoverageTitle.textContent = `${translated} / ${total}`;
+        signalCoverageMeta.textContent = `${record.company} 当前中文覆盖率 ${coverage}%`;
+        signalCoverageFill.style.width = `${coverage}%`;
+      }
+
+      function jumpToProgress(ratio) {
+        const targets =
+          state.viewMode === "zh"
+            ? [zhBody]
+            : state.viewMode === "en"
+              ? [enBody]
+              : [zhBody, enBody];
+        for (const target of targets) {
+          const max = Math.max(0, target.scrollHeight - target.clientHeight);
+          target.scrollTop = max * ratio;
+        }
+      }
+
       function setPaneLoading(targetBody, targetStatus, label) {
         updatePaneStatus(targetStatus, "Loading", "loading");
         targetBody.innerHTML = `
@@ -1678,20 +1866,27 @@
             const zhText = await loadFile(company, chinese);
             updatePaneStatus(zhStatus, "Loaded", "loaded");
             zhBody.innerHTML = renderMarkdown(zhText);
+            state.lastZhText = zhText;
           } catch (error) {
             setPaneError(zhBody, zhStatus, "中文文档读取失败", error);
+            state.lastZhText = "";
           }
+        } else {
+          state.lastZhText = "";
         }
 
         try {
           const enText = await loadFile(company, english);
           updatePaneStatus(enStatus, "Loaded", "loaded");
           enBody.innerHTML = renderMarkdown(enText);
+          state.lastEnText = enText;
         } catch (error) {
           setPaneError(enBody, enStatus, "英文文档读取失败", error);
+          state.lastEnText = "";
         }
 
         attachLinkedHighlights();
+        updateSelectionSignals(state.selected, state.lastZhText, state.lastEnText);
         zhBody.scrollTop = 0;
         enBody.scrollTop = 0;
       }
@@ -1813,6 +2008,10 @@
         syncViewMode();
         syncLayoutMode();
       });
+
+      jumpTopBtn.addEventListener("click", () => jumpToProgress(0));
+      jumpMiddleBtn.addEventListener("click", () => jumpToProgress(0.5));
+      jumpBottomBtn.addEventListener("click", () => jumpToProgress(1));
 
       mobileToggle.addEventListener("click", () => {
         document.body.classList.toggle("nav-open");
