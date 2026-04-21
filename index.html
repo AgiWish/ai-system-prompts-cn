@@ -580,6 +580,77 @@
         gap: 12px;
       }
 
+      .outline-bar {
+        display: grid;
+        grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+      }
+
+      .outline-intro,
+      .outline-track {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 252, 247, 0.68);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+      }
+
+      .outline-intro {
+        padding: 14px 15px;
+      }
+
+      .outline-intro strong {
+        display: block;
+        margin: 4px 0 6px;
+        font-size: 16px;
+      }
+
+      .outline-intro p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .outline-track {
+        padding: 10px;
+      }
+
+      .outline-list {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        scrollbar-width: thin;
+      }
+
+      .outline-chip {
+        flex: 0 0 auto;
+        min-height: 38px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.66);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        line-height: 1.2;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .outline-chip:hover {
+        transform: translateY(-1px);
+        border-color: rgba(169, 79, 45, 0.28);
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--text);
+      }
+
+      .outline-chip.is-active {
+        border-color: rgba(30, 99, 90, 0.28);
+        background: rgba(30, 99, 90, 0.1);
+        color: var(--accent-2);
+      }
+
       .signal-card {
         padding: 14px 15px;
         border-radius: 18px;
@@ -801,6 +872,11 @@
         transform: translateY(-1px);
       }
 
+      .doc-block.is-active-anchor {
+        border-color: rgba(30, 99, 90, 0.24);
+        box-shadow: 0 0 0 3px rgba(30, 99, 90, 0.08);
+      }
+
       .markdown > :first-child,
       .doc-block > :first-child {
         margin-top: 0;
@@ -934,6 +1010,10 @@
 
         .selection-dashboard {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .outline-bar {
+          grid-template-columns: 1fr;
         }
 
         .method-grid {
@@ -1192,6 +1272,19 @@
             </article>
           </section>
 
+          <section class="outline-bar">
+            <article class="outline-intro">
+              <div class="control-label">段落导航</div>
+              <strong id="outlineTitle">选择文档后生成导航轨</strong>
+              <p id="outlineMeta">优先提取标题层级；如果文档没有标题，则回退到正文片段导航。</p>
+            </article>
+            <article class="outline-track">
+              <div class="outline-list" id="outlineList">
+                <button class="outline-chip is-active" type="button">等待载入</button>
+              </div>
+            </article>
+          </section>
+
           <section class="panes layout-split" id="panes">
             <article class="pane" id="zhPane">
               <header class="pane-head">
@@ -1370,6 +1463,7 @@
         layoutMode: "zh-focus",
         syncScroll: true,
         filterMode: "all",
+        activeBlockIndex: "0",
         cache: new Map()
       };
 
@@ -1398,6 +1492,9 @@
       const signalCoverageTitle = document.getElementById("signalCoverageTitle");
       const signalCoverageMeta = document.getElementById("signalCoverageMeta");
       const signalCoverageFill = document.getElementById("signalCoverageFill");
+      const outlineTitle = document.getElementById("outlineTitle");
+      const outlineMeta = document.getElementById("outlineMeta");
+      const outlineList = document.getElementById("outlineList");
       const zhFileName = document.getElementById("zhFileName");
       const zhStatus = document.getElementById("zhStatus");
       const zhBody = document.getElementById("zhBody");
@@ -1594,15 +1691,21 @@
         return html;
       }
 
+      function compactLabel(text, limit = 28) {
+        const normalized = String(text || "").replace(/\s+/g, " ").trim();
+        if (!normalized) return "Untitled";
+        return normalized.length > limit ? `${normalized.slice(0, limit)}…` : normalized;
+      }
+
       function renderMarkdown(source) {
         const lines = source.replace(/\r\n?/g, "\n").split("\n");
         const html = [];
         let i = 0;
         let blockIndex = 0;
 
-        function pushBlock(kind, content) {
+        function pushBlock(kind, content, label = "") {
           html.push(
-            `<section class="doc-block" data-block-kind="${kind}" data-block-index="${blockIndex++}">${content}</section>`
+            `<section class="doc-block" data-block-kind="${kind}" data-block-index="${blockIndex++}" data-block-label="${escapeHtml(label)}">${content}</section>`
           );
         }
 
@@ -1625,7 +1728,8 @@
             i += 1;
             pushBlock(
               "code",
-              `<pre><code class="language-${escapeHtml(fence)}">${escapeHtml(block.join("\n"))}</code></pre>`
+              `<pre><code class="language-${escapeHtml(fence)}">${escapeHtml(block.join("\n"))}</code></pre>`,
+              fence ? `Code · ${fence}` : "Code Block"
             );
             continue;
           }
@@ -1633,13 +1737,13 @@
           const heading = line.match(/^(#{1,6})\s+(.*)$/);
           if (heading) {
             const level = heading[1].length;
-            pushBlock("heading", `<h${level}>${parseInline(heading[2])}</h${level}>`);
+            pushBlock("heading", `<h${level}>${parseInline(heading[2])}</h${level}>`, heading[2]);
             i += 1;
             continue;
           }
 
           if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
-            pushBlock("rule", "<hr />");
+            pushBlock("rule", "<hr />", "Section Break");
             i += 1;
             continue;
           }
@@ -1652,7 +1756,8 @@
             }
             pushBlock(
               "quote",
-              `<blockquote>${block.map((part) => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`
+              `<blockquote>${block.map((part) => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`,
+              compactLabel(block[0] || "Quote")
             );
             continue;
           }
@@ -1663,7 +1768,7 @@
               items.push(`<li>${parseInline(lines[i].replace(/^[-*+]\s+/, ""))}</li>`);
               i += 1;
             }
-            pushBlock("list", `<ul>${items.join("")}</ul>`);
+            pushBlock("list", `<ul>${items.join("")}</ul>`, compactLabel(lines[i - items.length].replace(/^[-*+]\s+/, "")));
             continue;
           }
 
@@ -1673,7 +1778,7 @@
               items.push(`<li>${parseInline(lines[i].replace(/^\d+\.\s+/, ""))}</li>`);
               i += 1;
             }
-            pushBlock("list", `<ol>${items.join("")}</ol>`);
+            pushBlock("list", `<ol>${items.join("")}</ol>`, compactLabel(lines[i - items.length].replace(/^\d+\.\s+/, "")));
             continue;
           }
 
@@ -1691,7 +1796,11 @@
             paragraph.push(lines[i].trim());
             i += 1;
           }
-          pushBlock("paragraph", `<p>${paragraph.map((linePart) => parseInline(linePart.trim())).join("<br />")}</p>`);
+          pushBlock(
+            "paragraph",
+            `<p>${paragraph.map((linePart) => parseInline(linePart.trim())).join("<br />")}</p>`,
+            compactLabel(paragraph[0] || "Paragraph")
+          );
         }
 
         return `<div class="markdown">${html.join("")}</div>`;
@@ -1750,6 +1859,81 @@
         signalCoverageTitle.textContent = `${translated} / ${total}`;
         signalCoverageMeta.textContent = `${record.company} 当前中文覆盖率 ${coverage}%`;
         signalCoverageFill.style.width = `${coverage}%`;
+      }
+
+      function syncActiveBlocks() {
+        for (const container of [zhBody, enBody]) {
+          for (const block of container.querySelectorAll("[data-block-index]")) {
+            block.classList.toggle("is-active-anchor", block.dataset.blockIndex === state.activeBlockIndex);
+          }
+        }
+      }
+
+      function syncOutlineState() {
+        for (const button of outlineList.querySelectorAll("[data-outline-index]")) {
+          button.classList.toggle("is-active", button.dataset.outlineIndex === state.activeBlockIndex);
+        }
+      }
+
+      function scrollPairToIndex(index) {
+        state.activeBlockIndex = String(index);
+        for (const container of [zhBody, enBody]) {
+          const target = container.querySelector(`[data-block-index="${index}"]`);
+          if (target) {
+            target.scrollIntoView({ block: "center", behavior: "smooth" });
+          }
+        }
+        syncOutlineState();
+        syncActiveBlocks();
+      }
+
+      function buildOutline() {
+        const sourceBlocks = Array.from(zhBody.querySelectorAll("[data-block-index]")).length
+          ? Array.from(zhBody.querySelectorAll("[data-block-index]"))
+          : Array.from(enBody.querySelectorAll("[data-block-index]"));
+        const headingBlocks = sourceBlocks.filter((node) => node.dataset.blockKind === "heading");
+        const outlineBlocks = (headingBlocks.length ? headingBlocks : sourceBlocks).slice(0, 18);
+
+        outlineTitle.textContent = outlineBlocks.length ? "点击章节直接跳转" : "选择文档后生成导航轨";
+        outlineMeta.textContent = headingBlocks.length
+          ? `已提取 ${headingBlocks.length} 个标题锚点，用于快速切换章节。`
+          : "当前文档标题较少，导航轨已回退为正文片段。";
+
+        outlineList.innerHTML = outlineBlocks.length
+          ? outlineBlocks
+              .map((node, idx) => {
+                const index = node.dataset.blockIndex;
+                const label = compactLabel(node.dataset.blockLabel || `Section ${idx + 1}`, 32);
+                return `<button class="outline-chip ${index === state.activeBlockIndex ? "is-active" : ""}" type="button" data-outline-index="${index}">${escapeHtml(label)}</button>`;
+              })
+              .join("")
+          : `<button class="outline-chip is-active" type="button">无导航项</button>`;
+
+        for (const button of outlineList.querySelectorAll("[data-outline-index]")) {
+          button.addEventListener("click", () => {
+            scrollPairToIndex(button.dataset.outlineIndex);
+          });
+        }
+      }
+
+      function updateActiveBlockFromScroll(source) {
+        const blocks = Array.from(source.querySelectorAll("[data-block-index]"));
+        if (!blocks.length) return;
+        const sourceTop = source.getBoundingClientRect().top;
+        let active = blocks[0];
+        let best = Number.POSITIVE_INFINITY;
+        for (const block of blocks) {
+          const distance = Math.abs(block.getBoundingClientRect().top - sourceTop - 40);
+          if (distance < best) {
+            best = distance;
+            active = block;
+          }
+        }
+        if (active.dataset.blockIndex !== state.activeBlockIndex) {
+          state.activeBlockIndex = active.dataset.blockIndex;
+          syncOutlineState();
+          syncActiveBlocks();
+        }
       }
 
       function jumpToProgress(ratio) {
@@ -1816,6 +2000,10 @@
               }
             });
 
+            block.addEventListener("click", () => {
+              scrollPairToIndex(block.dataset.blockIndex);
+            });
+
             block.addEventListener("mouseleave", () => {
               for (const map of groups) {
                 for (const peer of map.values()) {
@@ -1841,8 +2029,14 @@
         });
       }
 
-      zhBody.addEventListener("scroll", () => syncScrollBetween(zhBody, enBody));
-      enBody.addEventListener("scroll", () => syncScrollBetween(enBody, zhBody));
+      zhBody.addEventListener("scroll", () => {
+        syncScrollBetween(zhBody, enBody);
+        updateActiveBlockFromScroll(zhBody);
+      });
+      enBody.addEventListener("scroll", () => {
+        syncScrollBetween(enBody, zhBody);
+        updateActiveBlockFromScroll(enBody);
+      });
 
       async function renderSelection() {
         if (!state.selected) return;
@@ -1886,6 +2080,9 @@
         }
 
         attachLinkedHighlights();
+        state.activeBlockIndex = "0";
+        buildOutline();
+        syncActiveBlocks();
         updateSelectionSignals(state.selected, state.lastZhText, state.lastEnText);
         zhBody.scrollTop = 0;
         enBody.scrollTop = 0;
