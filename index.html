@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI System Prompts Atlas</title>
+    <style>
+      :root {
+        --bg: #f2ede4;
+        --bg-soft: rgba(255, 251, 244, 0.78);
+        --panel: rgba(255, 248, 239, 0.66);
+        --panel-strong: rgba(33, 30, 26, 0.9);
+        --text: #231d18;
+        --muted: #72675d;
+        --line: rgba(53, 43, 33, 0.12);
+        --line-strong: rgba(53, 43, 33, 0.22);
+        --accent: #be4f2c;
+        --accent-soft: rgba(190, 79, 44, 0.12);
+        --accent-2: #0f5f54;
+        --accent-3: #c5a34d;
+        --good: #2f7d5b;
+        --warn: #8f6732;
+        --shadow: 0 28px 70px rgba(41, 28, 16, 0.14);
+        --radius-xl: 30px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --sidebar-width: 340px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Songti SC", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(197, 163, 77, 0.28), transparent 36%),
+          radial-gradient(circle at right 20%, rgba(15, 95, 84, 0.18), transparent 28%),
+          linear-gradient(135deg, #ede6d7 0%, #f5f0e7 42%, #e7dfd0 100%);
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 36px,
+            rgba(53, 43, 33, 0.025) 36px,
+            rgba(53, 43, 33, 0.025) 37px
+          );
+        mix-blend-mode: multiply;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+        height: 100vh;
+        position: relative;
+      }
+
+      .sidebar {
+        position: relative;
+        border-right: 1px solid var(--line);
+        padding: 28px 18px 24px;
+        background:
+          linear-gradient(180deg, rgba(255, 252, 247, 0.86), rgba(243, 236, 225, 0.72)),
+          rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
+
+      .sidebar::after {
+        content: "";
+        position: absolute;
+        inset: 18px 18px 18px auto;
+        width: 1px;
+        background: linear-gradient(180deg, transparent, rgba(190, 79, 44, 0.28), transparent);
+      }
+
+      .brand {
+        padding: 0 8px 22px;
+        animation: rise 0.8s ease both;
+      }
+
+      .brand-kicker {
+        font-family: "Avenir Next Condensed", "Franklin Gothic Medium", sans-serif;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-size: 11px;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .brand-title {
+        font-family: "Didot", "Bodoni 72", "Times New Roman", serif;
+        font-size: clamp(34px, 4vw, 48px);
+        line-height: 0.92;
+        letter-spacing: -0.04em;
+        margin: 0;
+      }
+
+      .brand-note {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 24ch;
+      }
+
+      .search-panel,
+      .meta-panel {
+        margin: 0 6px 16px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--bg-soft);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        animation: rise 0.9s ease both;
+      }
+
+      .search-panel {
+        animation-delay: 0.08s;
+      }
+
+      .meta-panel {
+        animation-delay: 0.12s;
+      }
+
+      .label {
+        display: block;
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .search-input {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 14px;
+        outline: none;
+        font: inherit;
+        transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+      }
+
+      .search-input:focus {
+        border-color: rgba(190, 79, 44, 0.42);
+        box-shadow: 0 0 0 4px rgba(190, 79, 44, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .stat-card {
+        border-radius: 16px;
+        padding: 12px 12px 10px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(53, 43, 33, 0.08);
+      }
+
+      .stat-card strong {
+        display: block;
+        font-size: 22px;
+        font-family: "Didot", "Bodoni 72", serif;
+        font-weight: 600;
+      }
+
+      .stat-card span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .company-list {
+        overflow: auto;
+        height: calc(100vh - 356px);
+        padding: 4px 6px 20px;
+        scrollbar-width: thin;
+      }
+
+      .company {
+        margin-bottom: 10px;
+        animation: rise 0.8s ease both;
+      }
+
+      .company:nth-child(odd) {
+        animation-delay: 0.05s;
+      }
+
+      .company-header {
+        width: 100%;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(248, 239, 227, 0.8));
+        padding: 14px 14px 13px;
+        border-radius: 18px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      }
+
+      .company-header:hover {
+        transform: translateX(4px);
+        border-color: rgba(190, 79, 44, 0.28);
+        box-shadow: 0 10px 24px rgba(190, 79, 44, 0.08);
+      }
+
+      .company.active .company-header {
+        border-color: rgba(190, 79, 44, 0.36);
+        box-shadow: 0 16px 30px rgba(190, 79, 44, 0.12);
+      }
+
+      .company-name {
+        font-family: "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.02em;
+      }
+
+      .company-sub {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .company-arrow {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(190, 79, 44, 0.08);
+        color: var(--accent);
+        transition: transform 200ms ease;
+        font-size: 18px;
+      }
+
+      .company.expanded .company-arrow {
+        transform: rotate(90deg);
+      }
+
+      .file-tree {
+        margin: 8px 0 0;
+        padding: 8px 8px 2px 18px;
+        border-left: 1px solid rgba(53, 43, 33, 0.12);
+      }
+
+      .file-item {
+        position: relative;
+        margin-bottom: 8px;
+      }
+
+      .file-item::before {
+        content: "";
+        position: absolute;
+        top: 19px;
+        left: -18px;
+        width: 12px;
+        border-top: 1px solid rgba(53, 43, 33, 0.12);
+      }
+
+      .file-button {
+        width: 100%;
+        text-align: left;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 10px 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        color: var(--text);
+        transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+      }
+
+      .file-button:hover {
+        background: rgba(255, 255, 255, 0.58);
+        border-color: rgba(53, 43, 33, 0.08);
+        transform: translateX(3px);
+      }
+
+      .file-button.active {
+        background: linear-gradient(135deg, rgba(190, 79, 44, 0.14), rgba(197, 163, 77, 0.14));
+        border-color: rgba(190, 79, 44, 0.24);
+      }
+
+      .file-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .file-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--accent-2);
+        flex: none;
+      }
+
+      .file-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+
+      .pill {
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      .pill.good {
+        color: var(--good);
+        border-color: rgba(47, 125, 91, 0.18);
+        background: rgba(47, 125, 91, 0.08);
+      }
+
+      .pill.warn {
+        color: var(--warn);
+        border-color: rgba(143, 103, 50, 0.18);
+        background: rgba(143, 103, 50, 0.08);
+      }
+
+      .main {
+        padding: 22px;
+        overflow: auto;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 24px 28px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-xl);
+        background:
+          radial-gradient(circle at 90% 0%, rgba(190, 79, 44, 0.18), transparent 30%),
+          radial-gradient(circle at left bottom, rgba(15, 95, 84, 0.16), transparent 28%),
+          linear-gradient(135deg, rgba(255, 252, 247, 0.92), rgba(245, 238, 228, 0.76));
+        box-shadow: var(--shadow);
+        animation: rise 0.85s ease both;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -60px -70px auto;
+        width: 260px;
+        height: 260px;
+        border-radius: 40px;
+        border: 1px solid rgba(53, 43, 33, 0.08);
+        transform: rotate(18deg);
+        background: linear-gradient(135deg, rgba(197, 163, 77, 0.16), rgba(255, 255, 255, 0.02));
+      }
+
+      .hero-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .hero-kicker {
+        font-family: "Avenir Next Condensed", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        font-size: 11px;
+        color: var(--accent);
+      }
+
+      .hero-title {
+        margin: 8px 0 10px;
+        font-family: "Didot", "Bodoni 72", "STSong", serif;
+        font-size: clamp(34px, 5vw, 60px);
+        line-height: 0.94;
+        letter-spacing: -0.045em;
+        max-width: 12ch;
+      }
+
+      .hero-desc {
+        max-width: 62ch;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75;
+        margin: 0;
+      }
+
+      .hero-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .hero-badge {
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.58);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .toolbar {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1.2fr repeat(3, auto);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .path-box {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.56);
+        color: var(--muted);
+        overflow: hidden;
+      }
+
+      .path-box code {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 13px;
+      }
+
+      .tool-btn {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+        border-radius: 16px;
+        min-height: 54px;
+        padding: 0 16px;
+        cursor: pointer;
+        font: inherit;
+        color: var(--text);
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      }
+
+      .tool-btn:hover {
+        transform: translateY(-2px);
+        border-color: rgba(190, 79, 44, 0.32);
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .tool-btn.is-active {
+        border-color: rgba(15, 95, 84, 0.28);
+        background: rgba(15, 95, 84, 0.08);
+        color: var(--accent-2);
+      }
+
+      .warning {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(143, 103, 50, 0.2);
+        background: rgba(197, 163, 77, 0.14);
+        color: #654713;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .panes {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 20px;
+      }
+
+      .pane {
+        min-height: calc(100vh - 300px);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(255, 252, 248, 0.84), rgba(248, 241, 231, 0.72));
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+
+      .pane-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 250, 244, 0.82);
+        backdrop-filter: blur(12px);
+      }
+
+      .pane-label {
+        font-family: "Avenir Next Condensed", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .pane-file {
+        margin-top: 4px;
+        font-size: 14px;
+        color: var(--text);
+      }
+
+      .pane-status {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .pane-body {
+        padding: 28px 28px 42px;
+        max-height: calc(100vh - 380px);
+        overflow: auto;
+      }
+
+      .empty-state {
+        display: grid;
+        place-items: center;
+        min-height: 220px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 8px;
+        font-family: "Didot", "Bodoni 72", serif;
+        font-size: 28px;
+        color: var(--text);
+      }
+
+      .markdown {
+        font-size: 16px;
+        line-height: 1.82;
+        color: #2f261f;
+      }
+
+      .markdown > :first-child {
+        margin-top: 0;
+      }
+
+      .markdown h1,
+      .markdown h2,
+      .markdown h3,
+      .markdown h4,
+      .markdown h5,
+      .markdown h6 {
+        margin: 1.55em 0 0.55em;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        font-family: "Didot", "Bodoni 72", "Songti SC", serif;
+      }
+
+      .markdown h1 {
+        font-size: 2.3em;
+      }
+
+      .markdown h2 {
+        font-size: 1.7em;
+        border-bottom: 1px solid rgba(53, 43, 33, 0.12);
+        padding-bottom: 0.28em;
+      }
+
+      .markdown h3 {
+        font-size: 1.28em;
+      }
+
+      .markdown p,
+      .markdown ul,
+      .markdown ol,
+      .markdown blockquote,
+      .markdown pre,
+      .markdown hr {
+        margin: 0 0 1.12em;
+      }
+
+      .markdown ul,
+      .markdown ol {
+        padding-left: 1.4em;
+      }
+
+      .markdown li + li {
+        margin-top: 0.34em;
+      }
+
+      .markdown a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(190, 79, 44, 0.3);
+      }
+
+      .markdown code {
+        font-family: "SFMono-Regular", "Menlo", "Consolas", monospace;
+        font-size: 0.92em;
+        padding: 0.14em 0.36em;
+        border-radius: 8px;
+        background: rgba(15, 95, 84, 0.08);
+      }
+
+      .markdown pre {
+        overflow: auto;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(33, 30, 26, 0.92);
+        color: #f7f2e8;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      }
+
+      .markdown pre code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+      }
+
+      .markdown blockquote {
+        padding: 14px 18px;
+        border-left: 4px solid rgba(190, 79, 44, 0.36);
+        background: rgba(190, 79, 44, 0.06);
+        border-radius: 0 16px 16px 0;
+        color: #5a4534;
+      }
+
+      .markdown hr {
+        border: 0;
+        border-top: 1px solid rgba(53, 43, 33, 0.14);
+      }
+
+      .markdown strong {
+        color: #1d1712;
+      }
+
+      .markdown em {
+        color: #5a4637;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .mobile-toggle {
+        display: none;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1080px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: fixed;
+          z-index: 30;
+          inset: 0 auto 0 0;
+          width: min(86vw, 360px);
+          transform: translateX(-100%);
+          transition: transform 220ms ease;
+          box-shadow: 24px 0 70px rgba(41, 28, 16, 0.2);
+        }
+
+        body.nav-open .sidebar {
+          transform: translateX(0);
+        }
+
+        .main {
+          padding: 14px;
+        }
+
+        .panes {
+          grid-template-columns: 1fr;
+        }
+
+        .pane {
+          min-height: auto;
+        }
+
+        .pane-body {
+          max-height: none;
+        }
+
+        .toolbar {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .path-box {
+          grid-column: 1 / -1;
+        }
+
+        .mobile-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .hero {
+          padding: 20px 18px;
+        }
+
+        .hero-title {
+          font-size: 38px;
+          max-width: none;
+        }
+
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .pane-head,
+        .pane-body {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-kicker">Prompt Archive</div>
+          <h1 class="brand-title">System Prompt Atlas</h1>
+          <p class="brand-note">
+            面向当前仓库的阅读器。左侧按公司分层浏览，右侧对照查看中英文内容。
+          </p>
+        </div>
+
+        <section class="search-panel">
+          <label class="label" for="searchInput">Search Titles</label>
+          <input
+            id="searchInput"
+            class="search-input"
+            type="search"
+            placeholder="搜索公司或文件名"
+            autocomplete="off"
+          />
+        </section>
+
+        <section class="meta-panel">
+          <span class="label">Collection Stats</span>
+          <div class="stats">
+            <div class="stat-card">
+              <strong id="companyCount">0</strong>
+              <span>Companies</span>
+            </div>
+            <div class="stat-card">
+              <strong id="recordCount">0</strong>
+              <span>Records</span>
+            </div>
+            <div class="stat-card">
+              <strong id="pairCount">0</strong>
+              <span>CN-EN Pairs</span>
+            </div>
+            <div class="stat-card">
+              <strong id="filteredCount">0</strong>
+              <span>Visible</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="company-list" id="companyList" aria-label="公司目录树"></div>
+      </aside>
+
+      <main class="main">
+        <section class="hero">
+          <div class="hero-top">
+            <div>
+              <div class="hero-kicker">Curated Reading Interface</div>
+              <div class="hero-title">中文与英文并排阅读，不再来回切换。</div>
+              <p class="hero-desc">
+                这个页面按你当前仓库的数据结构生成，默认把英文源文档和 `中文/`
+                下的翻译版做配对。支持目录树浏览、标题搜索、双栏对照、Markdown
+                渲染以及只看中文或英文的切换。
+              </p>
+              <div class="hero-badges">
+                <span class="hero-badge">Editorial / Archive Aesthetic</span>
+                <span class="hero-badge">Pure HTML + CSS + JS</span>
+                <span class="hero-badge">No External Runtime</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="path-box">
+              <code id="selectedPath">选择左侧文件开始阅读</code>
+            </div>
+            <button class="tool-btn mobile-toggle" id="mobileToggle" type="button">目录</button>
+            <button class="tool-btn is-active" id="viewBothBtn" type="button">双栏对照</button>
+            <button class="tool-btn" id="viewZhBtn" type="button">只看中文</button>
+            <button class="tool-btn" id="viewEnBtn" type="button">只看英文</button>
+          </div>
+
+          <div class="warning" id="protocolWarning" hidden>
+            当前看起来是以 <code>file://</code> 直接打开页面。多数浏览器会阻止
+            JavaScript 读取本地文档，因此右侧内容可能无法加载。建议在项目根目录执行
+            <code>python3 -m http.server 8000</code> 后访问
+            <code>http://localhost:8000/index.html</code>。
+          </div>
+        </section>
+
+        <section class="panes" id="panes">
+          <article class="pane" id="zhPane">
+            <header class="pane-head">
+              <div>
+                <div class="pane-label">Chinese</div>
+                <div class="pane-file" id="zhFileName">未选择文件</div>
+              </div>
+              <div class="pane-status" id="zhStatus">等待选择</div>
+            </header>
+            <div class="pane-body" id="zhBody">
+              <div class="empty-state">
+                <div>
+                  <strong>选择一个文件</strong>
+                  左侧点击公司并展开目录树，然后挑选一个文档开始阅读。
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="pane" id="enPane">
+            <header class="pane-head">
+              <div>
+                <div class="pane-label">English</div>
+                <div class="pane-file" id="enFileName">未选择文件</div>
+              </div>
+              <div class="pane-status" id="enStatus">等待选择</div>
+            </header>
+            <div class="pane-body" id="enBody">
+              <div class="empty-state">
+                <div>
+                  <strong>Atlas Ready</strong>
+                  这个阅读器会按原仓库路径抓取文档，并保留 Markdown 的层级结构。
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const MANIFEST = [
+        {
+          company: "ANTHROPIC",
+          records: [
+            { name: "Claude-4.1.txt", english: "Claude-4.1.txt", chinese: "中文/Claude-4.1.txt" },
+            { name: "Claude-4.5-Opus.txt", english: "Claude-4.5-Opus.txt", chinese: "中文/Claude-4.5-Opus.txt" },
+            { name: "Claude-Design-Sys-Prompt.txt", english: "Claude-Design-Sys-Prompt.txt", chinese: "中文/Claude-Design-Sys-Prompt.txt" },
+            { name: "Claude-Opus-4.7.txt", english: "Claude-Opus-4.7.txt", chinese: "中文/Claude-Opus-4.7.txt" },
+            { name: "Claude_4.txt", english: "Claude_4.txt", chinese: "中文/Claude_4.txt" },
+            { name: "Claude_Code_03-04-24.md", english: "Claude_Code_03-04-24.md", chinese: "中文/Claude_Code_03-04-24.md" },
+            { name: "Claude_Opus_4.6.txt", english: "Claude_Opus_4.6.txt", chinese: "中文/Claude_Opus_4.6.txt" },
+            { name: "Claude_Sonnet-4.5_Sep-29-2025.txt", english: "Claude_Sonnet-4.5_Sep-29-2025.txt", chinese: "中文/Claude_Sonnet-4.5_Sep-29-2025.txt" },
+            { name: "Claude_Sonnet_3.5.md", english: "Claude_Sonnet_3.5.md", chinese: "中文/Claude_Sonnet_3.5.md" },
+            { name: "Claude_Sonnet_3.7_New.txt", english: "Claude_Sonnet_3.7_New.txt", chinese: "中文/Claude_Sonnet_3.7_New.txt" },
+            { name: "UserStyle_Modes.md", english: "UserStyle_Modes.md", chinese: "中文/UserStyle_Modes.md" }
+          ]
+        },
+        { company: "BOLT", records: [{ name: "Bolt.txt", english: "Bolt.txt", chinese: null }] },
+        { company: "BRAVE", records: [{ name: "LEO_Aug-31-2025", english: "LEO_Aug-31-2025", chinese: "中文/LEO_Aug-31-2025" }] },
+        { company: "CLINE", records: [{ name: "Cline.md", english: "Cline.md", chinese: null }] },
+        { company: "CLUELY", records: [{ name: "Cluely.mkd", english: "Cluely.mkd", chinese: "中文/Cluely.mkd" }] },
+        {
+          company: "CURSOR",
+          records: [
+            { name: "Cursor_2.0_Sys_Prompt.txt", english: "Cursor_2.0_Sys_Prompt.txt", chinese: "中文/Cursor_2.0_Sys_Prompt.txt" },
+            { name: "Cursor_Prompt.md", english: "Cursor_Prompt.md", chinese: "中文/Cursor_Prompt.md" },
+            { name: "Cursor_Tools.md", english: "Cursor_Tools.md", chinese: "中文/Cursor_Tools.md" }
+          ]
+        },
+        {
+          company: "DEVIN",
+          records: [
+            { name: "Devin2_09-08-2025.md", english: "Devin2_09-08-2025.md", chinese: null },
+            { name: "Devin_2.0.md", english: "Devin_2.0.md", chinese: null },
+            { name: "Devin_2.0_Commands.md", english: "Devin_2.0_Commands.md", chinese: null }
+          ]
+        },
+        {
+          company: "DIA",
+          records: [
+            { name: "Dia_CodingSkill.txt", english: "Dia_CodingSkill.txt", chinese: null },
+            { name: "Dia_DraftSkill.txt", english: "Dia_DraftSkill.txt", chinese: "中文/Dia_DraftSkill.txt" }
+          ]
+        },
+        { company: "FACTORY", records: [{ name: "DROID.txt", english: "DROID.txt", chinese: null }] },
+        {
+          company: "GOOGLE",
+          records: [
+            { name: "Gemini-2.5-Pro-04-18-2025.md", english: "Gemini-2.5-Pro-04-18-2025.md", chinese: null },
+            { name: "Gemini_Diffusion.md", english: "Gemini_Diffusion.md", chinese: "中文/Gemini_Diffusion.md" },
+            { name: "Gemini_Gmail_Assistant.txt", english: "Gemini_Gmail_Assistant.txt", chinese: "中文/Gemini_Gmail_Assistant.txt" }
+          ]
+        },
+        { company: "HUME", records: [{ name: "Hume_Voice_AI.md", english: "Hume_Voice_AI.md", chinese: "中文/Hume_Voice_AI.md" }] },
+        { company: "LOVABLE", records: [{ name: "Lovable_2.0.txt", english: "Lovable_2.0.txt", chinese: null }] },
+        {
+          company: "MANUS",
+          records: [
+            { name: "Manus_Functions.txt", english: "Manus_Functions.txt", chinese: null },
+            { name: "Manus_Prompt.txt", english: "Manus_Prompt.txt", chinese: null }
+          ]
+        },
+        {
+          company: "META",
+          records: [
+            { name: "Llama4_WhatsApp.txt", english: "Llama4_WhatsApp.txt", chinese: "中文/Llama4_WhatsApp.txt" },
+            { name: "Muse_Spark_Apr-08-26.txt", english: "Muse_Spark_Apr-08-26.txt", chinese: null }
+          ]
+        },
+        { company: "MINIMAX", records: [{ name: "MiniMax.txt", english: "MiniMax.txt", chinese: "中文/MiniMax.txt" }] },
+        { company: "MISTRAL", records: [{ name: "LeChat.md", english: "LeChat.md", chinese: "中文/LeChat.md" }] },
+        {
+          company: "MOONSHOT",
+          records: [
+            { name: "Kimi_2_July-11-2025.txt", english: "Kimi_2_July-11-2025.txt", chinese: null },
+            { name: "Kimi_K2_Thinking.txt", english: "Kimi_K2_Thinking.txt", chinese: "中文/Kimi_K2_Thinking.txt" }
+          ]
+        },
+        { company: "MULTION", records: [{ name: "MultiOn.md", english: "MultiOn.md", chinese: null }] },
+        {
+          company: "OPENAI",
+          records: [
+            { name: "Atlas_10-21-25.txt", english: "Atlas_10-21-25.txt", chinese: null },
+            { name: "ChatGPT-4o_Sep-27-25.txt", english: "ChatGPT-4o_Sep-27-25.txt", chinese: null },
+            { name: "ChatGPT5-08-07-2025.mkd", english: "ChatGPT5-08-07-2025.mkd", chinese: null },
+            { name: "ChatGPT_4.1_05-15-2025.txt", english: "ChatGPT_4.1_05-15-2025.txt", chinese: "中文/ChatGPT_4.1_05-15-2025.txt" },
+            { name: "ChatGPT_4o_04-25-2025.txt", english: "ChatGPT_4o_04-25-2025.txt", chinese: "中文/ChatGPT_4o_04-25-2025.txt" },
+            { name: "ChatGPT_Personality_v2_Change.md", english: "ChatGPT_Personality_v2_Change.md", chinese: "中文/ChatGPT_Personality_v2_Change.md" },
+            { name: "ChatGPT_o3_o4-mini_04-16-2025", english: "ChatGPT_o3_o4-mini_04-16-2025", chinese: null },
+            { name: "ChatKit_Docs__Oct-6-25.txt", english: "ChatKit_Docs__Oct-6-25.txt", chinese: null },
+            { name: "Codex.md", english: "Codex.md", chinese: null },
+            { name: "Codex_Sep-15-2025.md", english: "Codex_Sep-15-2025.md", chinese: null },
+            { name: "GPT-4.5_02-27-25.md", english: "GPT-4.5_02-27-25.md", chinese: "中文/GPT-4.5_02-27-25.md" },
+            { name: "GPT-4o_Image_Gen_Postfill.txt", english: "GPT-4o_Image_Gen_Postfill.txt", chinese: "中文/GPT-4o_Image_Gen_Postfill.txt" }
+          ]
+        },
+        { company: "PERPLEXITY", records: [{ name: "Perplexity_Deep_Research.txt", english: "Perplexity_Deep_Research.txt", chinese: null }] },
+        {
+          company: "REPLIT",
+          records: [
+            { name: "Replit_Agent.md", english: "Replit_Agent.md", chinese: null },
+            { name: "Replit_Functions.md", english: "Replit_Functions.md", chinese: "中文/Replit_Functions.md" },
+            { name: "Replit_Initial_Code_Generation_Prompt.md", english: "Replit_Initial_Code_Generation_Prompt.md", chinese: null }
+          ]
+        },
+        { company: "SAMEDEV", records: [{ name: "Same_Dev.txt", english: "Same_Dev.txt", chinese: null }] },
+        { company: "VERCEL V0", records: [{ name: "Vercel_v0.txt", english: "Vercel_v0.txt", chinese: null }] },
+        {
+          company: "WINDSURF",
+          records: [
+            { name: "Windsurf_Prompt.md", english: "Windsurf_Prompt.md", chinese: null },
+            { name: "Windsurf_Tools.md", english: "Windsurf_Tools.md", chinese: null }
+          ]
+        },
+        {
+          company: "XAI",
+          records: [
+            { name: "GROK-4-NEW_Jul-13-2025", english: "GROK-4-NEW_Jul-13-2025", chinese: null },
+            { name: "GROK-4.1_Nov-17-2025.txt", english: "GROK-4.1_Nov-17-2025.txt", chinese: null },
+            { name: "GROK-4.20.mkd", english: "GROK-4.20.mkd", chinese: null },
+            { name: "Grok-Code-Fast-1_Aug-26-2025.txt", english: "Grok-Code-Fast-1_Aug-26-2025.txt", chinese: null },
+            { name: "Grok3.md", english: "Grok3.md", chinese: null },
+            { name: "Grok3_updated_07-08-2025.md", english: "Grok3_updated_07-08-2025.md", chinese: null },
+            { name: "Grok4-July-10-2025.md", english: "Grok4-July-10-2025.md", chinese: null }
+          ]
+        }
+      ];
+
+      const state = {
+        search: "",
+        expandedCompanies: new Set(),
+        selected: null,
+        viewMode: "both",
+        cache: new Map()
+      };
+
+      const companyList = document.getElementById("companyList");
+      const searchInput = document.getElementById("searchInput");
+      const companyCount = document.getElementById("companyCount");
+      const recordCount = document.getElementById("recordCount");
+      const pairCount = document.getElementById("pairCount");
+      const filteredCount = document.getElementById("filteredCount");
+      const selectedPath = document.getElementById("selectedPath");
+      const zhFileName = document.getElementById("zhFileName");
+      const zhStatus = document.getElementById("zhStatus");
+      const zhBody = document.getElementById("zhBody");
+      const enFileName = document.getElementById("enFileName");
+      const enStatus = document.getElementById("enStatus");
+      const enBody = document.getElementById("enBody");
+      const zhPane = document.getElementById("zhPane");
+      const enPane = document.getElementById("enPane");
+      const panes = document.getElementById("panes");
+      const viewBothBtn = document.getElementById("viewBothBtn");
+      const viewZhBtn = document.getElementById("viewZhBtn");
+      const viewEnBtn = document.getElementById("viewEnBtn");
+      const mobileToggle = document.getElementById("mobileToggle");
+      const protocolWarning = document.getElementById("protocolWarning");
+
+      const totals = MANIFEST.reduce(
+        (acc, company) => {
+          acc.company += 1;
+          acc.records += company.records.length;
+          acc.pairs += company.records.filter((record) => Boolean(record.chinese)).length;
+          return acc;
+        },
+        { company: 0, records: 0, pairs: 0 }
+      );
+
+      companyCount.textContent = totals.company;
+      recordCount.textContent = totals.records;
+      pairCount.textContent = totals.pairs;
+
+      if (location.protocol === "file:") {
+        protocolWarning.hidden = false;
+      }
+
+      function encodePath(path) {
+        return path
+          .split("/")
+          .map((segment) => encodeURIComponent(segment))
+          .join("/");
+      }
+
+      function matchRecord(company, record, search) {
+        if (!search) return true;
+        const needle = search.toLowerCase();
+        return (
+          company.company.toLowerCase().includes(needle) ||
+          record.name.toLowerCase().includes(needle) ||
+          record.english.toLowerCase().includes(needle) ||
+          (record.chinese && record.chinese.toLowerCase().includes(needle))
+        );
+      }
+
+      function renderSidebar() {
+        const search = state.search.trim();
+        const filtered = MANIFEST.map((company) => ({
+          ...company,
+          records: company.records.filter((record) => matchRecord(company, record, search))
+        })).filter((company) => company.records.length > 0);
+
+        filteredCount.textContent = filtered.reduce((sum, company) => sum + company.records.length, 0);
+
+        companyList.innerHTML = filtered
+          .map((company) => {
+            const isExpanded = search ? true : state.expandedCompanies.has(company.company);
+            const isActive = state.selected && state.selected.company === company.company;
+            return `
+              <section class="company ${isActive ? "active" : ""} ${isExpanded ? "expanded" : ""}">
+                <button
+                  class="company-header"
+                  type="button"
+                  data-company-toggle="${escapeHtml(company.company)}"
+                >
+                  <span>
+                    <span class="company-name">${escapeHtml(company.company)}</span>
+                    <span class="company-sub">${company.records.length} files visible</span>
+                  </span>
+                  <span class="company-arrow">›</span>
+                </button>
+                ${
+                  isExpanded
+                    ? `<div class="file-tree">
+                        ${company.records
+                          .map((record) => {
+                            const key = `${company.company}/${record.english}`;
+                            const selected =
+                              state.selected &&
+                              state.selected.company === company.company &&
+                              state.selected.english === record.english;
+                            return `
+                              <div class="file-item">
+                                <button
+                                  class="file-button ${selected ? "active" : ""}"
+                                  type="button"
+                                  data-file-select="${escapeHtml(key)}"
+                                >
+                                  <div class="file-title">
+                                    <span class="file-dot"></span>
+                                    <span>${escapeHtml(record.name)}</span>
+                                  </div>
+                                  <div class="file-meta">
+                                    <span class="pill">${fileType(record.name)}</span>
+                                    <span class="pill ${record.chinese ? "good" : "warn"}">
+                                      ${record.chinese ? "CN Ready" : "EN Only"}
+                                    </span>
+                                  </div>
+                                </button>
+                              </div>
+                            `;
+                          })
+                          .join("")}
+                      </div>`
+                    : ""
+                }
+              </section>
+            `;
+          })
+          .join("");
+
+        for (const toggle of companyList.querySelectorAll("[data-company-toggle]")) {
+          toggle.addEventListener("click", () => {
+            const companyName = toggle.dataset.companyToggle;
+            if (state.expandedCompanies.has(companyName)) {
+              state.expandedCompanies.delete(companyName);
+            } else {
+              state.expandedCompanies.add(companyName);
+            }
+            renderSidebar();
+          });
+        }
+
+        for (const button of companyList.querySelectorAll("[data-file-select]")) {
+          button.addEventListener("click", () => {
+            const [companyName, ...rest] = button.dataset.fileSelect.split("/");
+            const english = rest.join("/");
+            const company = MANIFEST.find((item) => item.company === companyName);
+            if (!company) return;
+            const record = company.records.find((item) => item.english === english);
+            if (!record) return;
+            state.selected = { company: companyName, ...record };
+            state.expandedCompanies.add(companyName);
+            renderSidebar();
+            renderSelection();
+            if (window.innerWidth <= 1080) {
+              document.body.classList.remove("nav-open");
+            }
+          });
+        }
+      }
+
+      function fileType(name) {
+        const lower = name.toLowerCase();
+        if (lower.endsWith(".md") || lower.endsWith(".mkd")) return "Markdown";
+        if (lower.endsWith(".txt")) return "Text";
+        return "Doc";
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function parseInline(text) {
+        let html = escapeHtml(text);
+        html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+        html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+        return html;
+      }
+
+      function renderMarkdown(source) {
+        const lines = source.replace(/\r\n?/g, "\n").split("\n");
+        const html = [];
+        let i = 0;
+
+        while (i < lines.length) {
+          const line = lines[i];
+
+          if (!line.trim()) {
+            i += 1;
+            continue;
+          }
+
+          if (/^```/.test(line)) {
+            const fence = line.slice(3).trim();
+            const block = [];
+            i += 1;
+            while (i < lines.length && !/^```/.test(lines[i])) {
+              block.push(lines[i]);
+              i += 1;
+            }
+            i += 1;
+            html.push(
+              `<pre><code class="language-${escapeHtml(fence)}">${escapeHtml(block.join("\n"))}</code></pre>`
+            );
+            continue;
+          }
+
+          const heading = line.match(/^(#{1,6})\s+(.*)$/);
+          if (heading) {
+            const level = heading[1].length;
+            html.push(`<h${level}>${parseInline(heading[2])}</h${level}>`);
+            i += 1;
+            continue;
+          }
+
+          if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+            html.push("<hr />");
+            i += 1;
+            continue;
+          }
+
+          if (/^>\s?/.test(line)) {
+            const block = [];
+            while (i < lines.length && /^>\s?/.test(lines[i])) {
+              block.push(lines[i].replace(/^>\s?/, ""));
+              i += 1;
+            }
+            html.push(`<blockquote>${block.map((part) => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`);
+            continue;
+          }
+
+          if (/^[-*+]\s+/.test(line)) {
+            const items = [];
+            while (i < lines.length && /^[-*+]\s+/.test(lines[i])) {
+              items.push(`<li>${parseInline(lines[i].replace(/^[-*+]\s+/, ""))}</li>`);
+              i += 1;
+            }
+            html.push(`<ul>${items.join("")}</ul>`);
+            continue;
+          }
+
+          if (/^\d+\.\s+/.test(line)) {
+            const items = [];
+            while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+              items.push(`<li>${parseInline(lines[i].replace(/^\d+\.\s+/, ""))}</li>`);
+              i += 1;
+            }
+            html.push(`<ol>${items.join("")}</ol>`);
+            continue;
+          }
+
+          const paragraph = [];
+          while (
+            i < lines.length &&
+            lines[i].trim() &&
+            !/^(#{1,6})\s+/.test(lines[i]) &&
+            !/^```/.test(lines[i]) &&
+            !/^>\s?/.test(lines[i]) &&
+            !/^[-*+]\s+/.test(lines[i]) &&
+            !/^\d+\.\s+/.test(lines[i]) &&
+            !/^(-{3,}|\*{3,}|_{3,})$/.test(lines[i].trim())
+          ) {
+            paragraph.push(lines[i].trim());
+            i += 1;
+          }
+          html.push(`<p>${paragraph.map((linePart) => parseInline(linePart.trim())).join("<br />")}</p>`);
+        }
+
+        return `<div class="markdown">${html.join("")}</div>`;
+      }
+
+      async function loadFile(company, relPath) {
+        if (!relPath) return null;
+        const key = `${company}/${relPath}`;
+        if (state.cache.has(key)) return state.cache.get(key);
+
+        const path = `${encodeURIComponent(company)}/${encodePath(relPath)}`;
+        const response = await fetch(path);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${path}`);
+        }
+        const text = await response.text();
+        state.cache.set(key, text);
+        return text;
+      }
+
+      function setPaneLoading(targetBody, targetStatus, label) {
+        targetStatus.textContent = "Loading";
+        targetBody.innerHTML = `
+          <div class="empty-state">
+            <div>
+              <strong>${label}</strong>
+              正在读取文档内容...
+            </div>
+          </div>
+        `;
+      }
+
+      function setPaneEmpty(targetBody, targetStatus, title, desc) {
+        targetStatus.textContent = "Unavailable";
+        targetBody.innerHTML = `
+          <div class="empty-state">
+            <div>
+              <strong>${escapeHtml(title)}</strong>
+              ${escapeHtml(desc)}
+            </div>
+          </div>
+        `;
+      }
+
+      function setPaneError(targetBody, targetStatus, title, error) {
+        targetStatus.textContent = "Read Error";
+        targetBody.innerHTML = `
+          <div class="empty-state">
+            <div>
+              <strong>${escapeHtml(title)}</strong>
+              ${escapeHtml(error.message || String(error))}
+            </div>
+          </div>
+        `;
+      }
+
+      async function renderSelection() {
+        if (!state.selected) return;
+
+        const { company, english, chinese, name } = state.selected;
+        selectedPath.textContent = `${company}/${english}${chinese ? `  ⇄  ${company}/${chinese}` : ""}`;
+        zhFileName.textContent = chinese ? `${company}/${chinese}` : "暂无中文版本";
+        enFileName.textContent = `${company}/${english}`;
+
+        if (chinese) {
+          setPaneLoading(zhBody, zhStatus, "Chinese");
+        } else {
+          setPaneEmpty(zhBody, zhStatus, "暂无中文对照", `${name} 当前只有英文文件。`);
+        }
+
+        setPaneLoading(enBody, enStatus, "English");
+
+        if (chinese) {
+          try {
+            const zhText = await loadFile(company, chinese);
+            zhStatus.textContent = "Loaded";
+            zhBody.innerHTML = renderMarkdown(zhText);
+          } catch (error) {
+            setPaneError(zhBody, zhStatus, "中文文档读取失败", error);
+          }
+        }
+
+        try {
+          const enText = await loadFile(company, english);
+          enStatus.textContent = "Loaded";
+          enBody.innerHTML = renderMarkdown(enText);
+        } catch (error) {
+          setPaneError(enBody, enStatus, "英文文档读取失败", error);
+        }
+      }
+
+      function syncViewMode() {
+        viewBothBtn.classList.toggle("is-active", state.viewMode === "both");
+        viewZhBtn.classList.toggle("is-active", state.viewMode === "zh");
+        viewEnBtn.classList.toggle("is-active", state.viewMode === "en");
+
+        if (state.viewMode === "both") {
+          panes.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+          zhPane.hidden = false;
+          enPane.hidden = false;
+        } else if (state.viewMode === "zh") {
+          panes.style.gridTemplateColumns = "1fr";
+          zhPane.hidden = false;
+          enPane.hidden = true;
+        } else {
+          panes.style.gridTemplateColumns = "1fr";
+          zhPane.hidden = true;
+          enPane.hidden = false;
+        }
+      }
+
+      searchInput.addEventListener("input", (event) => {
+        state.search = event.target.value;
+        renderSidebar();
+      });
+
+      viewBothBtn.addEventListener("click", () => {
+        state.viewMode = "both";
+        syncViewMode();
+      });
+
+      viewZhBtn.addEventListener("click", () => {
+        state.viewMode = "zh";
+        syncViewMode();
+      });
+
+      viewEnBtn.addEventListener("click", () => {
+        state.viewMode = "en";
+        syncViewMode();
+      });
+
+      mobileToggle.addEventListener("click", () => {
+        document.body.classList.toggle("nav-open");
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          document.body.classList.remove("nav-open");
+        }
+      });
+
+      state.expandedCompanies.add("OPENAI");
+      state.expandedCompanies.add("ANTHROPIC");
+      state.selected = {
+        company: "OPENAI",
+        name: "ChatGPT_Personality_v2_Change.md",
+        english: "ChatGPT_Personality_v2_Change.md",
+        chinese: "中文/ChatGPT_Personality_v2_Change.md"
+      };
+
+      renderSidebar();
+      syncViewMode();
+      renderSelection();
+    </script>
+  </body>
+</html>
