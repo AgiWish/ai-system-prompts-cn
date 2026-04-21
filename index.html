@@ -6,25 +6,26 @@
     <title>AI System Prompts Atlas</title>
     <style>
       :root {
-        --bg: #f2ede4;
-        --bg-soft: rgba(255, 251, 244, 0.78);
-        --panel: rgba(255, 248, 239, 0.66);
-        --panel-strong: rgba(33, 30, 26, 0.9);
-        --text: #231d18;
-        --muted: #72675d;
-        --line: rgba(53, 43, 33, 0.12);
-        --line-strong: rgba(53, 43, 33, 0.22);
-        --accent: #be4f2c;
-        --accent-soft: rgba(190, 79, 44, 0.12);
-        --accent-2: #0f5f54;
-        --accent-3: #c5a34d;
+        --bg: #ece6da;
+        --bg-deep: #e0d6c6;
+        --panel: rgba(253, 249, 242, 0.8);
+        --panel-strong: rgba(255, 252, 247, 0.92);
+        --text: #241b16;
+        --muted: #6b6157;
+        --line: rgba(65, 47, 31, 0.12);
+        --line-strong: rgba(65, 47, 31, 0.24);
+        --accent: #a94f2d;
+        --accent-soft: rgba(169, 79, 45, 0.12);
+        --accent-2: #1e635a;
+        --accent-2-soft: rgba(30, 99, 90, 0.1);
+        --accent-3: #c7a148;
         --good: #2f7d5b;
         --warn: #8f6732;
-        --shadow: 0 28px 70px rgba(41, 28, 16, 0.14);
-        --radius-xl: 30px;
+        --shadow: 0 26px 60px rgba(45, 31, 18, 0.14);
+        --radius-xl: 28px;
         --radius-lg: 22px;
         --radius-md: 16px;
-        --sidebar-width: 340px;
+        --sidebar-width: 330px;
       }
 
       * {
@@ -38,12 +39,12 @@
       }
 
       body {
-        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Songti SC", serif;
+        font-family: "Source Han Serif SC", "Iowan Old Style", "Songti SC", serif;
         color: var(--text);
         background:
-          radial-gradient(circle at top left, rgba(197, 163, 77, 0.28), transparent 36%),
-          radial-gradient(circle at right 20%, rgba(15, 95, 84, 0.18), transparent 28%),
-          linear-gradient(135deg, #ede6d7 0%, #f5f0e7 42%, #e7dfd0 100%);
+          radial-gradient(circle at top left, rgba(199, 161, 72, 0.22), transparent 32%),
+          radial-gradient(circle at 85% 10%, rgba(30, 99, 90, 0.15), transparent 24%),
+          linear-gradient(135deg, var(--bg) 0%, #f4efe6 48%, var(--bg-deep) 100%);
         overflow: hidden;
       }
 
@@ -53,13 +54,13 @@
         inset: 0;
         pointer-events: none;
         background:
-          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
           repeating-linear-gradient(
             90deg,
             transparent 0,
-            transparent 36px,
-            rgba(53, 43, 33, 0.025) 36px,
-            rgba(53, 43, 33, 0.025) 37px
+            transparent 52px,
+            rgba(60, 45, 28, 0.022) 52px,
+            rgba(60, 45, 28, 0.022) 53px
           );
         mix-blend-mode: multiply;
       }
@@ -73,10 +74,12 @@
 
       .sidebar {
         position: relative;
+        display: flex;
+        flex-direction: column;
         border-right: 1px solid var(--line);
-        padding: 28px 18px 24px;
+        padding: 24px 18px 18px;
         background:
-          linear-gradient(180deg, rgba(255, 252, 247, 0.86), rgba(243, 236, 225, 0.72)),
+          linear-gradient(180deg, rgba(255, 252, 247, 0.9), rgba(243, 236, 226, 0.78)),
           rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(16px);
         overflow: hidden;
@@ -85,66 +88,61 @@
       .sidebar::after {
         content: "";
         position: absolute;
-        inset: 18px 18px 18px auto;
+        inset: 22px 16px 22px auto;
         width: 1px;
-        background: linear-gradient(180deg, transparent, rgba(190, 79, 44, 0.28), transparent);
+        background: linear-gradient(180deg, transparent, rgba(169, 79, 45, 0.34), transparent);
       }
 
       .brand {
-        padding: 0 8px 22px;
-        animation: rise 0.8s ease both;
+        padding: 0 8px 16px;
+        animation: rise 0.7s ease both;
       }
 
-      .brand-kicker {
-        font-family: "Avenir Next Condensed", "Franklin Gothic Medium", sans-serif;
-        letter-spacing: 0.24em;
+      .brand-kicker,
+      .label,
+      .control-label,
+      .pane-label,
+      .inspector-kicker,
+      .method-kicker {
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
         text-transform: uppercase;
+        letter-spacing: 0.16em;
         font-size: 11px;
+      }
+
+      .brand-kicker,
+      .inspector-kicker {
         color: var(--accent);
-        margin-bottom: 10px;
       }
 
       .brand-title {
-        font-family: "Didot", "Bodoni 72", "Times New Roman", serif;
-        font-size: clamp(34px, 4vw, 48px);
-        line-height: 0.92;
+        margin: 8px 0 10px;
+        font-family: "Didot", "Bodoni 72", "STSong", serif;
+        font-size: clamp(28px, 3.4vw, 42px);
+        line-height: 0.95;
         letter-spacing: -0.04em;
-        margin: 0;
       }
 
       .brand-note {
-        margin: 12px 0 0;
+        margin: 0;
         color: var(--muted);
-        font-size: 14px;
-        line-height: 1.6;
-        max-width: 24ch;
+        font-size: 13px;
+        line-height: 1.65;
+        max-width: 28ch;
       }
 
       .search-panel,
       .meta-panel {
-        margin: 0 6px 16px;
-        padding: 16px;
+        margin: 0 4px 14px;
+        padding: 14px;
         border: 1px solid var(--line);
         border-radius: var(--radius-lg);
-        background: var(--bg-soft);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-        animation: rise 0.9s ease both;
-      }
-
-      .search-panel {
-        animation-delay: 0.08s;
-      }
-
-      .meta-panel {
-        animation-delay: 0.12s;
+        background: rgba(255, 251, 244, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
       }
 
       .label {
         display: block;
-        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        font-size: 11px;
         color: var(--muted);
         margin-bottom: 10px;
       }
@@ -152,19 +150,50 @@
       .search-input {
         width: 100%;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.78);
         color: var(--text);
         padding: 12px 14px;
         border-radius: 14px;
         outline: none;
         font: inherit;
-        transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
       }
 
       .search-input:focus {
-        border-color: rgba(190, 79, 44, 0.42);
-        box-shadow: 0 0 0 4px rgba(190, 79, 44, 0.1);
+        border-color: rgba(169, 79, 45, 0.34);
+        box-shadow: 0 0 0 4px rgba(169, 79, 45, 0.08);
         transform: translateY(-1px);
+      }
+
+      .filter-row {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mini-btn {
+        min-height: 34px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.68);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .mini-btn:hover {
+        border-color: rgba(169, 79, 45, 0.28);
+        color: var(--text);
+      }
+
+      .mini-btn.is-active {
+        border-color: rgba(30, 99, 90, 0.24);
+        background: rgba(30, 99, 90, 0.1);
+        color: var(--accent-2);
       }
 
       .stats {
@@ -175,8 +204,8 @@
 
       .stat-card {
         border-radius: 16px;
-        padding: 12px 12px 10px;
-        background: rgba(255, 255, 255, 0.7);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.68);
         border: 1px solid rgba(53, 43, 33, 0.08);
       }
 
@@ -184,7 +213,6 @@
         display: block;
         font-size: 22px;
         font-family: "Didot", "Bodoni 72", serif;
-        font-weight: 600;
       }
 
       .stat-card span {
@@ -193,45 +221,39 @@
       }
 
       .company-list {
+        flex: 1;
         overflow: auto;
-        height: calc(100vh - 356px);
-        padding: 4px 6px 20px;
+        padding: 4px 4px 20px;
         scrollbar-width: thin;
       }
 
       .company {
         margin-bottom: 10px;
-        animation: rise 0.8s ease both;
-      }
-
-      .company:nth-child(odd) {
-        animation-delay: 0.05s;
       }
 
       .company-header {
         width: 100%;
         border: 1px solid var(--line);
-        background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(248, 239, 227, 0.8));
-        padding: 14px 14px 13px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(247, 239, 228, 0.84));
+        padding: 14px;
         border-radius: 18px;
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 8px;
+        gap: 10px;
         align-items: center;
         cursor: pointer;
-        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
       }
 
       .company-header:hover {
-        transform: translateX(4px);
-        border-color: rgba(190, 79, 44, 0.28);
-        box-shadow: 0 10px 24px rgba(190, 79, 44, 0.08);
+        transform: translateX(3px);
+        border-color: rgba(169, 79, 45, 0.28);
+        box-shadow: 0 10px 24px rgba(169, 79, 45, 0.08);
       }
 
       .company.active .company-header {
-        border-color: rgba(190, 79, 44, 0.36);
-        box-shadow: 0 16px 30px rgba(190, 79, 44, 0.12);
+        border-color: rgba(169, 79, 45, 0.34);
+        box-shadow: 0 12px 28px rgba(169, 79, 45, 0.12);
       }
 
       .company-name {
@@ -253,9 +275,9 @@
         display: grid;
         place-items: center;
         border-radius: 999px;
-        background: rgba(190, 79, 44, 0.08);
+        background: rgba(169, 79, 45, 0.08);
         color: var(--accent);
-        transition: transform 200ms ease;
+        transition: transform 180ms ease;
         font-size: 18px;
       }
 
@@ -265,7 +287,7 @@
 
       .file-tree {
         margin: 8px 0 0;
-        padding: 8px 8px 2px 18px;
+        padding: 8px 6px 2px 16px;
         border-left: 1px solid rgba(53, 43, 33, 0.12);
       }
 
@@ -278,8 +300,8 @@
         content: "";
         position: absolute;
         top: 19px;
-        left: -18px;
-        width: 12px;
+        left: -16px;
+        width: 10px;
         border-top: 1px solid rgba(53, 43, 33, 0.12);
       }
 
@@ -288,7 +310,7 @@
         text-align: left;
         border: 1px solid transparent;
         background: transparent;
-        padding: 10px 12px;
+        padding: 11px 12px;
         border-radius: 14px;
         cursor: pointer;
         color: var(--text);
@@ -298,12 +320,12 @@
       .file-button:hover {
         background: rgba(255, 255, 255, 0.58);
         border-color: rgba(53, 43, 33, 0.08);
-        transform: translateX(3px);
+        transform: translateX(2px);
       }
 
       .file-button.active {
-        background: linear-gradient(135deg, rgba(190, 79, 44, 0.14), rgba(197, 163, 77, 0.14));
-        border-color: rgba(190, 79, 44, 0.24);
+        background: linear-gradient(135deg, rgba(169, 79, 45, 0.14), rgba(199, 161, 72, 0.16));
+        border-color: rgba(169, 79, 45, 0.24);
       }
 
       .file-title {
@@ -311,7 +333,7 @@
         align-items: center;
         gap: 8px;
         font-size: 14px;
-        line-height: 1.4;
+        line-height: 1.45;
       }
 
       .file-dot {
@@ -326,7 +348,7 @@
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
-        margin-top: 6px;
+        margin-top: 7px;
       }
 
       .pill {
@@ -354,118 +376,123 @@
       }
 
       .main {
-        padding: 22px;
-        overflow: auto;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 16px;
+        padding: 18px;
+        overflow: hidden;
       }
 
-      .hero {
-        position: relative;
-        overflow: hidden;
-        padding: 24px 28px;
+      .inspector {
         border: 1px solid var(--line);
         border-radius: var(--radius-xl);
         background:
-          radial-gradient(circle at 90% 0%, rgba(190, 79, 44, 0.18), transparent 30%),
-          radial-gradient(circle at left bottom, rgba(15, 95, 84, 0.16), transparent 28%),
-          linear-gradient(135deg, rgba(255, 252, 247, 0.92), rgba(245, 238, 228, 0.76));
+          radial-gradient(circle at 92% 0%, rgba(169, 79, 45, 0.16), transparent 28%),
+          radial-gradient(circle at 0% 100%, rgba(30, 99, 90, 0.14), transparent 24%),
+          linear-gradient(135deg, rgba(255, 252, 247, 0.92), rgba(246, 239, 230, 0.82));
         box-shadow: var(--shadow);
-        animation: rise 0.85s ease both;
+        overflow: hidden;
       }
 
-      .hero::after {
-        content: "";
-        position: absolute;
-        inset: auto -60px -70px auto;
-        width: 260px;
-        height: 260px;
-        border-radius: 40px;
-        border: 1px solid rgba(53, 43, 33, 0.08);
-        transform: rotate(18deg);
-        background: linear-gradient(135deg, rgba(197, 163, 77, 0.16), rgba(255, 255, 255, 0.02));
-      }
-
-      .hero-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
+      .inspector-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 18px;
-        flex-wrap: wrap;
+        padding: 18px 20px 14px;
+        border-bottom: 1px solid var(--line);
       }
 
-      .hero-kicker {
-        font-family: "Avenir Next Condensed", sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.22em;
-        font-size: 11px;
-        color: var(--accent);
+      .selection-block {
+        min-width: 0;
       }
 
-      .hero-title {
-        margin: 8px 0 10px;
+      .selection-title {
+        margin: 8px 0 6px;
         font-family: "Didot", "Bodoni 72", "STSong", serif;
-        font-size: clamp(34px, 5vw, 60px);
-        line-height: 0.94;
-        letter-spacing: -0.045em;
-        max-width: 12ch;
+        font-size: clamp(26px, 3vw, 40px);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
       }
 
-      .hero-desc {
-        max-width: 62ch;
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.75;
+      .selection-path {
+        display: block;
         margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+        word-break: break-all;
       }
 
-      .hero-badges {
-        display: flex;
+      .inspector-note {
+        margin-top: 8px;
+        color: #5a5147;
+        font-size: 14px;
+        line-height: 1.65;
+        max-width: 72ch;
+      }
+
+      .mobile-toggle {
+        display: none;
+      }
+
+      .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(92px, 1fr));
         gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 18px;
+        align-self: start;
       }
 
-      .hero-badge {
-        padding: 10px 12px;
-        border-radius: 999px;
+      .quick-card {
+        padding: 12px 14px;
+        border-radius: 16px;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.58);
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .quick-card strong {
+        display: block;
+        font-family: "Didot", "Bodoni 72", serif;
+        font-size: 24px;
+      }
+
+      .quick-card span {
         font-size: 12px;
         color: var(--muted);
       }
 
-      .toolbar {
-        margin-top: 18px;
+      .inspector-controls {
         display: grid;
-        grid-template-columns: 1.2fr repeat(3, auto);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
-        align-items: center;
+        padding: 14px 20px 18px;
       }
 
-      .path-box {
-        min-height: 54px;
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-radius: 16px;
+      .control-panel,
+      .method-panel {
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.56);
-        color: var(--muted);
-        overflow: hidden;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.52);
+        padding: 14px;
       }
 
-      .path-box code {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 13px;
+      .control-label,
+      .method-kicker {
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .tool-btn {
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.72);
-        border-radius: 16px;
-        min-height: 54px;
-        padding: 0 16px;
+        border-radius: 14px;
+        min-height: 42px;
+        padding: 0 14px;
         cursor: pointer;
         font: inherit;
         color: var(--text);
@@ -473,82 +500,180 @@
       }
 
       .tool-btn:hover {
-        transform: translateY(-2px);
-        border-color: rgba(190, 79, 44, 0.32);
+        transform: translateY(-1px);
+        border-color: rgba(169, 79, 45, 0.3);
         background: rgba(255, 255, 255, 0.92);
       }
 
       .tool-btn.is-active {
-        border-color: rgba(15, 95, 84, 0.28);
-        background: rgba(15, 95, 84, 0.08);
+        border-color: rgba(30, 99, 90, 0.3);
+        background: rgba(30, 99, 90, 0.1);
         color: var(--accent-2);
       }
 
-      .warning {
-        margin-top: 16px;
-        padding: 14px 16px;
+      .method-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .method-card {
+        min-height: 100%;
+        padding: 12px;
         border-radius: 16px;
-        border: 1px solid rgba(143, 103, 50, 0.2);
-        background: rgba(197, 163, 77, 0.14);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(245, 239, 230, 0.78));
+        border: 1px solid rgba(53, 43, 33, 0.08);
+      }
+
+      .method-card strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+      }
+
+      .method-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .warning {
+        margin: 0 20px 18px;
+        padding: 13px 15px;
+        border-radius: 16px;
+        border: 1px solid rgba(143, 103, 50, 0.18);
+        background: rgba(199, 161, 72, 0.14);
         color: #654713;
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.6;
       }
 
+      .workspace {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .compare-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 2px;
+      }
+
+      .compare-caption {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .compare-caption strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .sync-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .sync-indicator::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--accent-2);
+        box-shadow: 0 0 0 5px rgba(30, 99, 90, 0.08);
+      }
+
       .panes {
+        min-height: 0;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 20px;
+        gap: 14px;
+      }
+
+      .panes.layout-split {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .panes.layout-zh-focus {
+        grid-template-columns: minmax(0, 1.28fr) minmax(280px, 0.86fr);
+      }
+
+      .panes.layout-en-focus {
+        grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.28fr);
       }
 
       .pane {
-        min-height: calc(100vh - 300px);
+        min-height: 0;
         border-radius: var(--radius-xl);
         border: 1px solid var(--line);
-        background:
-          linear-gradient(180deg, rgba(255, 252, 248, 0.84), rgba(248, 241, 231, 0.72));
+        background: linear-gradient(180deg, rgba(255, 252, 248, 0.86), rgba(248, 241, 231, 0.76));
         overflow: hidden;
         box-shadow: var(--shadow);
       }
 
       .pane-head {
-        position: sticky;
-        top: 0;
-        z-index: 2;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         gap: 12px;
-        padding: 18px 20px;
+        padding: 14px 18px;
         border-bottom: 1px solid var(--line);
-        background: rgba(255, 250, 244, 0.82);
+        background: rgba(255, 250, 244, 0.84);
         backdrop-filter: blur(12px);
       }
 
       .pane-label {
-        font-family: "Avenir Next Condensed", sans-serif;
-        font-size: 12px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
         color: var(--muted);
       }
 
       .pane-file {
         margin-top: 4px;
-        font-size: 14px;
+        font-size: 13px;
         color: var(--text);
+        word-break: break-all;
       }
 
       .pane-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         font-size: 12px;
         color: var(--muted);
       }
 
+      .pane-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(53, 43, 33, 0.18);
+      }
+
+      .pane-status.is-loaded::before {
+        background: var(--good);
+      }
+
+      .pane-status.is-loading::before {
+        background: var(--accent-3);
+      }
+
+      .pane-status.is-error::before {
+        background: var(--accent);
+      }
+
       .pane-body {
-        padding: 28px 28px 42px;
-        max-height: calc(100vh - 380px);
+        height: calc(100vh - 290px);
+        padding: 20px 18px 30px;
         overflow: auto;
+        scroll-behavior: smooth;
       }
 
       .empty-state {
@@ -568,12 +693,31 @@
       }
 
       .markdown {
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1.82;
         color: #2f261f;
       }
 
-      .markdown > :first-child {
+      .doc-block {
+        margin: 0 0 12px;
+        padding: 14px 14px 2px;
+        border: 1px solid transparent;
+        border-radius: 18px;
+        transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+      }
+
+      .doc-block:hover {
+        background: rgba(255, 255, 255, 0.48);
+      }
+
+      .doc-block.is-linked {
+        background: linear-gradient(135deg, rgba(169, 79, 45, 0.08), rgba(30, 99, 90, 0.08));
+        border-color: rgba(169, 79, 45, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .markdown > :first-child,
+      .doc-block > :first-child {
         margin-top: 0;
       }
 
@@ -583,24 +727,24 @@
       .markdown h4,
       .markdown h5,
       .markdown h6 {
-        margin: 1.55em 0 0.55em;
-        line-height: 1.15;
+        margin: 1.4em 0 0.52em;
+        line-height: 1.12;
         letter-spacing: -0.03em;
         font-family: "Didot", "Bodoni 72", "Songti SC", serif;
       }
 
       .markdown h1 {
-        font-size: 2.3em;
+        font-size: 2em;
       }
 
       .markdown h2 {
-        font-size: 1.7em;
+        font-size: 1.56em;
         border-bottom: 1px solid rgba(53, 43, 33, 0.12);
         padding-bottom: 0.28em;
       }
 
       .markdown h3 {
-        font-size: 1.28em;
+        font-size: 1.22em;
       }
 
       .markdown p,
@@ -609,12 +753,12 @@
       .markdown blockquote,
       .markdown pre,
       .markdown hr {
-        margin: 0 0 1.12em;
+        margin: 0 0 1.05em;
       }
 
       .markdown ul,
       .markdown ol {
-        padding-left: 1.4em;
+        padding-left: 1.35em;
       }
 
       .markdown li + li {
@@ -624,7 +768,7 @@
       .markdown a {
         color: var(--accent);
         text-decoration: none;
-        border-bottom: 1px solid rgba(190, 79, 44, 0.3);
+        border-bottom: 1px solid rgba(169, 79, 45, 0.28);
       }
 
       .markdown code {
@@ -632,16 +776,15 @@
         font-size: 0.92em;
         padding: 0.14em 0.36em;
         border-radius: 8px;
-        background: rgba(15, 95, 84, 0.08);
+        background: var(--accent-2-soft);
       }
 
       .markdown pre {
         overflow: auto;
         padding: 16px 18px;
         border-radius: 18px;
-        background: rgba(33, 30, 26, 0.92);
+        background: rgba(33, 30, 26, 0.94);
         color: #f7f2e8;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
 
       .markdown pre code {
@@ -652,8 +795,8 @@
 
       .markdown blockquote {
         padding: 14px 18px;
-        border-left: 4px solid rgba(190, 79, 44, 0.36);
-        background: rgba(190, 79, 44, 0.06);
+        border-left: 4px solid rgba(169, 79, 45, 0.36);
+        background: rgba(169, 79, 45, 0.06);
         border-radius: 0 16px 16px 0;
         color: #5a4534;
       }
@@ -683,10 +826,6 @@
         border: 0;
       }
 
-      .mobile-toggle {
-        display: none;
-      }
-
       @keyframes rise {
         from {
           opacity: 0;
@@ -695,6 +834,21 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .inspector-main,
+        .inspector-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-stats {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .method-grid {
+          grid-template-columns: 1fr;
         }
       }
 
@@ -721,55 +875,58 @@
           padding: 14px;
         }
 
-        .panes {
-          grid-template-columns: 1fr;
-        }
-
-        .pane {
-          min-height: auto;
-        }
-
-        .pane-body {
-          max-height: none;
-        }
-
-        .toolbar {
-          grid-template-columns: 1fr 1fr;
-        }
-
-        .path-box {
-          grid-column: 1 / -1;
-        }
-
         .mobile-toggle {
           display: inline-flex;
           align-items: center;
           justify-content: center;
         }
-      }
 
-      @media (max-width: 720px) {
-        .hero {
-          padding: 20px 18px;
-        }
-
-        .hero-title {
-          font-size: 38px;
-          max-width: none;
-        }
-
-        .toolbar {
+        .panes,
+        .panes.layout-split,
+        .panes.layout-zh-focus,
+        .panes.layout-en-focus {
           grid-template-columns: 1fr;
         }
 
-        .stats {
+        .pane-body {
+          height: auto;
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .brand-title {
+          font-size: 32px;
+        }
+
+        .selection-title {
+          font-size: 28px;
+        }
+
+        .quick-stats {
           grid-template-columns: 1fr 1fr;
+        }
+
+        .inspector-main,
+        .inspector-controls {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .warning {
+          margin-left: 16px;
+          margin-right: 16px;
         }
 
         .pane-head,
         .pane-body {
-          padding-left: 18px;
-          padding-right: 18px;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .compare-meta {
+          flex-direction: column;
+          align-items: flex-start;
         }
       }
     </style>
@@ -794,21 +951,26 @@
             placeholder="搜索公司或文件名"
             autocomplete="off"
           />
+          <div class="filter-row" aria-label="筛选翻译状态">
+            <button class="mini-btn is-active" id="filterAllBtn" type="button">全部</button>
+            <button class="mini-btn" id="filterTranslatedBtn" type="button">仅已翻译</button>
+            <button class="mini-btn" id="filterPendingBtn" type="button">待翻译</button>
+          </div>
         </section>
 
         <section class="meta-panel">
           <span class="label">Collection Stats</span>
           <div class="stats">
             <div class="stat-card">
-              <strong id="companyCount">0</strong>
+              <strong id="sidebarCompanyCount">0</strong>
               <span>Companies</span>
             </div>
             <div class="stat-card">
-              <strong id="recordCount">0</strong>
+              <strong id="sidebarRecordCount">0</strong>
               <span>Records</span>
             </div>
             <div class="stat-card">
-              <strong id="pairCount">0</strong>
+              <strong id="sidebarPairCount">0</strong>
               <span>CN-EN Pairs</span>
             </div>
             <div class="stat-card">
@@ -822,32 +984,71 @@
       </aside>
 
       <main class="main">
-        <section class="hero">
-          <div class="hero-top">
-            <div>
-              <div class="hero-kicker">Curated Reading Interface</div>
-              <div class="hero-title">中文与英文并排阅读，不再来回切换。</div>
-              <p class="hero-desc">
-                这个页面按你当前仓库的数据结构生成，默认把英文源文档和 `中文/`
-                下的翻译版做配对。支持目录树浏览、标题搜索、双栏对照、Markdown
-                渲染以及只看中文或英文的切换。
+        <section class="inspector">
+          <div class="inspector-main">
+            <div class="selection-block">
+              <button class="tool-btn mobile-toggle" id="mobileToggle" type="button">目录</button>
+              <div class="inspector-kicker">Translation Workbench</div>
+              <h2 class="selection-title" id="selectedTitle">选择左侧文件开始阅读</h2>
+              <code class="selection-path" id="selectedPath">系统会自动配对英文原文与 `中文/` 目录下的译文</code>
+              <p class="inspector-note">
+                阅读区已重构为更适合翻译校对的工作台：顶部压缩，正文放大，支持中文主视图、
+                联动滚动和段落联动高亮。
               </p>
-              <div class="hero-badges">
-                <span class="hero-badge">Editorial / Archive Aesthetic</span>
-                <span class="hero-badge">Pure HTML + CSS + JS</span>
-                <span class="hero-badge">No External Runtime</span>
+            </div>
+            <div class="quick-stats">
+              <div class="quick-card">
+                <strong id="companyCount">0</strong>
+                <span>Companies</span>
+              </div>
+              <div class="quick-card">
+                <strong id="recordCount">0</strong>
+                <span>Records</span>
+              </div>
+              <div class="quick-card">
+                <strong id="pairCount">0</strong>
+                <span>CN Pairs</span>
               </div>
             </div>
           </div>
 
-          <div class="toolbar">
-            <div class="path-box">
-              <code id="selectedPath">选择左侧文件开始阅读</code>
-            </div>
-            <button class="tool-btn mobile-toggle" id="mobileToggle" type="button">目录</button>
-            <button class="tool-btn is-active" id="viewBothBtn" type="button">双栏对照</button>
-            <button class="tool-btn" id="viewZhBtn" type="button">只看中文</button>
-            <button class="tool-btn" id="viewEnBtn" type="button">只看英文</button>
+          <div class="inspector-controls">
+            <section class="control-panel">
+              <div class="control-label">阅读视图</div>
+              <div class="button-row">
+                <button class="tool-btn is-active" id="viewBothBtn" type="button">对照阅读</button>
+                <button class="tool-btn" id="viewZhBtn" type="button">只看中文</button>
+                <button class="tool-btn" id="viewEnBtn" type="button">只看英文</button>
+              </div>
+            </section>
+
+            <section class="control-panel">
+              <div class="control-label">翻译方式</div>
+              <div class="button-row">
+                <button class="tool-btn is-active" id="layoutSplitBtn" type="button">镜像对照</button>
+                <button class="tool-btn" id="layoutZhFocusBtn" type="button">中文主视图</button>
+                <button class="tool-btn" id="layoutEnFocusBtn" type="button">英文主视图</button>
+                <button class="tool-btn is-active" id="syncScrollBtn" type="button">联动滚动</button>
+              </div>
+            </section>
+
+            <section class="method-panel">
+              <div class="method-kicker">中文翻译原则</div>
+              <div class="method-grid">
+                <div class="method-card">
+                  <strong>结构保真</strong>
+                  <p>保留标题层级、列表、代码块与链接，不把仓库文档翻译成另一种格式。</p>
+                </div>
+                <div class="method-card">
+                  <strong>术语稳态</strong>
+                  <p>模型名、工具名、文件路径优先保留原词，避免同一仓库内出现多种译法。</p>
+                </div>
+                <div class="method-card">
+                  <strong>校对工作流</strong>
+                  <p>先镜像对照，再切换中文主视图，把阅读空间让给译文，英文作为边栏参照。</p>
+                </div>
+              </div>
+            </section>
           </div>
 
           <div class="warning" id="protocolWarning" hidden>
@@ -858,42 +1059,49 @@
           </div>
         </section>
 
-        <section class="panes" id="panes">
-          <article class="pane" id="zhPane">
-            <header class="pane-head">
-              <div>
-                <div class="pane-label">Chinese</div>
-                <div class="pane-file" id="zhFileName">未选择文件</div>
-              </div>
-              <div class="pane-status" id="zhStatus">等待选择</div>
-            </header>
-            <div class="pane-body" id="zhBody">
-              <div class="empty-state">
-                <div>
-                  <strong>选择一个文件</strong>
-                  左侧点击公司并展开目录树，然后挑选一个文档开始阅读。
-                </div>
-              </div>
-            </div>
-          </article>
+        <section class="workspace">
+          <div class="compare-meta">
+            <div class="compare-caption" id="filteredSummary">浏览左侧目录，选择一个文件进入双语校对。</div>
+            <div class="sync-indicator" id="syncIndicator">双栏联动已启用</div>
+          </div>
 
-          <article class="pane" id="enPane">
-            <header class="pane-head">
-              <div>
-                <div class="pane-label">English</div>
-                <div class="pane-file" id="enFileName">未选择文件</div>
-              </div>
-              <div class="pane-status" id="enStatus">等待选择</div>
-            </header>
-            <div class="pane-body" id="enBody">
-              <div class="empty-state">
+          <section class="panes layout-split" id="panes">
+            <article class="pane" id="zhPane">
+              <header class="pane-head">
                 <div>
-                  <strong>Atlas Ready</strong>
-                  这个阅读器会按原仓库路径抓取文档，并保留 Markdown 的层级结构。
+                  <div class="pane-label">Chinese</div>
+                  <div class="pane-file" id="zhFileName">未选择文件</div>
+                </div>
+                <div class="pane-status" id="zhStatus">等待选择</div>
+              </header>
+              <div class="pane-body" id="zhBody">
+                <div class="empty-state">
+                  <div>
+                    <strong>选择一个文件</strong>
+                    左侧点击公司并展开目录树，然后挑选一个文档开始校对。
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
+            </article>
+
+            <article class="pane" id="enPane">
+              <header class="pane-head">
+                <div>
+                  <div class="pane-label">English</div>
+                  <div class="pane-file" id="enFileName">未选择文件</div>
+                </div>
+                <div class="pane-status" id="enStatus">等待选择</div>
+              </header>
+              <div class="pane-body" id="enBody">
+                <div class="empty-state">
+                  <div>
+                    <strong>Mirror Compare</strong>
+                    英文原文会和译文联动展示，滚动与段落高亮保持同步。
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
         </section>
       </main>
     </div>
@@ -1032,15 +1240,26 @@
         expandedCompanies: new Set(),
         selected: null,
         viewMode: "both",
+        layoutMode: "zh-focus",
+        syncScroll: true,
+        filterMode: "all",
         cache: new Map()
       };
 
       const companyList = document.getElementById("companyList");
       const searchInput = document.getElementById("searchInput");
+      const sidebarCompanyCount = document.getElementById("sidebarCompanyCount");
+      const sidebarRecordCount = document.getElementById("sidebarRecordCount");
+      const sidebarPairCount = document.getElementById("sidebarPairCount");
       const companyCount = document.getElementById("companyCount");
       const recordCount = document.getElementById("recordCount");
       const pairCount = document.getElementById("pairCount");
       const filteredCount = document.getElementById("filteredCount");
+      const filteredSummary = document.getElementById("filteredSummary");
+      const filterAllBtn = document.getElementById("filterAllBtn");
+      const filterTranslatedBtn = document.getElementById("filterTranslatedBtn");
+      const filterPendingBtn = document.getElementById("filterPendingBtn");
+      const selectedTitle = document.getElementById("selectedTitle");
       const selectedPath = document.getElementById("selectedPath");
       const zhFileName = document.getElementById("zhFileName");
       const zhStatus = document.getElementById("zhStatus");
@@ -1054,6 +1273,11 @@
       const viewBothBtn = document.getElementById("viewBothBtn");
       const viewZhBtn = document.getElementById("viewZhBtn");
       const viewEnBtn = document.getElementById("viewEnBtn");
+      const layoutSplitBtn = document.getElementById("layoutSplitBtn");
+      const layoutZhFocusBtn = document.getElementById("layoutZhFocusBtn");
+      const layoutEnFocusBtn = document.getElementById("layoutEnFocusBtn");
+      const syncScrollBtn = document.getElementById("syncScrollBtn");
+      const syncIndicator = document.getElementById("syncIndicator");
       const mobileToggle = document.getElementById("mobileToggle");
       const protocolWarning = document.getElementById("protocolWarning");
 
@@ -1070,6 +1294,9 @@
       companyCount.textContent = totals.company;
       recordCount.textContent = totals.records;
       pairCount.textContent = totals.pairs;
+      sidebarCompanyCount.textContent = totals.company;
+      sidebarRecordCount.textContent = totals.records;
+      sidebarPairCount.textContent = totals.pairs;
 
       if (location.protocol === "file:") {
         protocolWarning.hidden = false;
@@ -1083,6 +1310,8 @@
       }
 
       function matchRecord(company, record, search) {
+        if (state.filterMode === "translated" && !record.chinese) return false;
+        if (state.filterMode === "pending" && record.chinese) return false;
         if (!search) return true;
         const needle = search.toLowerCase();
         return (
@@ -1100,7 +1329,17 @@
           records: company.records.filter((record) => matchRecord(company, record, search))
         })).filter((company) => company.records.length > 0);
 
-        filteredCount.textContent = filtered.reduce((sum, company) => sum + company.records.length, 0);
+        const visibleCount = filtered.reduce((sum, company) => sum + company.records.length, 0);
+        filteredCount.textContent = visibleCount;
+        const modeLabel =
+          state.filterMode === "translated"
+            ? "仅已翻译"
+            : state.filterMode === "pending"
+              ? "待翻译"
+              : "全部";
+        filteredSummary.innerHTML = search
+          ? `<strong>${modeLabel}</strong> 下筛出 ${visibleCount} 份文档，覆盖 ${filtered.length} 个公司目录。`
+          : `当前查看 <strong>${modeLabel}</strong>，共 ${visibleCount} 份文档。`;
 
         companyList.innerHTML = filtered
           .map((company) => {
@@ -1219,6 +1458,13 @@
         const lines = source.replace(/\r\n?/g, "\n").split("\n");
         const html = [];
         let i = 0;
+        let blockIndex = 0;
+
+        function pushBlock(kind, content) {
+          html.push(
+            `<section class="doc-block" data-block-kind="${kind}" data-block-index="${blockIndex++}">${content}</section>`
+          );
+        }
 
         while (i < lines.length) {
           const line = lines[i];
@@ -1237,7 +1483,8 @@
               i += 1;
             }
             i += 1;
-            html.push(
+            pushBlock(
+              "code",
               `<pre><code class="language-${escapeHtml(fence)}">${escapeHtml(block.join("\n"))}</code></pre>`
             );
             continue;
@@ -1246,13 +1493,13 @@
           const heading = line.match(/^(#{1,6})\s+(.*)$/);
           if (heading) {
             const level = heading[1].length;
-            html.push(`<h${level}>${parseInline(heading[2])}</h${level}>`);
+            pushBlock("heading", `<h${level}>${parseInline(heading[2])}</h${level}>`);
             i += 1;
             continue;
           }
 
           if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
-            html.push("<hr />");
+            pushBlock("rule", "<hr />");
             i += 1;
             continue;
           }
@@ -1263,7 +1510,10 @@
               block.push(lines[i].replace(/^>\s?/, ""));
               i += 1;
             }
-            html.push(`<blockquote>${block.map((part) => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`);
+            pushBlock(
+              "quote",
+              `<blockquote>${block.map((part) => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`
+            );
             continue;
           }
 
@@ -1273,7 +1523,7 @@
               items.push(`<li>${parseInline(lines[i].replace(/^[-*+]\s+/, ""))}</li>`);
               i += 1;
             }
-            html.push(`<ul>${items.join("")}</ul>`);
+            pushBlock("list", `<ul>${items.join("")}</ul>`);
             continue;
           }
 
@@ -1283,7 +1533,7 @@
               items.push(`<li>${parseInline(lines[i].replace(/^\d+\.\s+/, ""))}</li>`);
               i += 1;
             }
-            html.push(`<ol>${items.join("")}</ol>`);
+            pushBlock("list", `<ol>${items.join("")}</ol>`);
             continue;
           }
 
@@ -1301,7 +1551,7 @@
             paragraph.push(lines[i].trim());
             i += 1;
           }
-          html.push(`<p>${paragraph.map((linePart) => parseInline(linePart.trim())).join("<br />")}</p>`);
+          pushBlock("paragraph", `<p>${paragraph.map((linePart) => parseInline(linePart.trim())).join("<br />")}</p>`);
         }
 
         return `<div class="markdown">${html.join("")}</div>`;
@@ -1322,8 +1572,13 @@
         return text;
       }
 
+      function updatePaneStatus(targetStatus, label, tone) {
+        targetStatus.textContent = label;
+        targetStatus.className = `pane-status${tone ? ` is-${tone}` : ""}`;
+      }
+
       function setPaneLoading(targetBody, targetStatus, label) {
-        targetStatus.textContent = "Loading";
+        updatePaneStatus(targetStatus, "Loading", "loading");
         targetBody.innerHTML = `
           <div class="empty-state">
             <div>
@@ -1335,7 +1590,7 @@
       }
 
       function setPaneEmpty(targetBody, targetStatus, title, desc) {
-        targetStatus.textContent = "Unavailable";
+        updatePaneStatus(targetStatus, "Unavailable", "");
         targetBody.innerHTML = `
           <div class="empty-state">
             <div>
@@ -1347,7 +1602,7 @@
       }
 
       function setPaneError(targetBody, targetStatus, title, error) {
-        targetStatus.textContent = "Read Error";
+        updatePaneStatus(targetStatus, "Read Error", "error");
         targetBody.innerHTML = `
           <div class="empty-state">
             <div>
@@ -1358,10 +1613,54 @@
         `;
       }
 
+      function attachLinkedHighlights() {
+        const groups = [zhBody, enBody].map((container) => new Map(
+          Array.from(container.querySelectorAll("[data-block-index]")).map((node) => [node.dataset.blockIndex, node])
+        ));
+
+        for (const container of [zhBody, enBody]) {
+          for (const block of container.querySelectorAll("[data-block-index]")) {
+            block.addEventListener("mouseenter", () => {
+              const index = block.dataset.blockIndex;
+              for (const map of groups) {
+                const peer = map.get(index);
+                if (peer) peer.classList.add("is-linked");
+              }
+            });
+
+            block.addEventListener("mouseleave", () => {
+              for (const map of groups) {
+                for (const peer of map.values()) {
+                  peer.classList.remove("is-linked");
+                }
+              }
+            });
+          }
+        }
+      }
+
+      function syncScrollBetween(source, target) {
+        if (!state.syncScroll || state.viewMode !== "both") return;
+        const sourceMax = source.scrollHeight - source.clientHeight;
+        const targetMax = target.scrollHeight - target.clientHeight;
+        if (sourceMax <= 0 || targetMax <= 0) return;
+        if (syncScrollBetween.locked) return;
+        syncScrollBetween.locked = true;
+        const ratio = source.scrollTop / sourceMax;
+        target.scrollTop = ratio * targetMax;
+        requestAnimationFrame(() => {
+          syncScrollBetween.locked = false;
+        });
+      }
+
+      zhBody.addEventListener("scroll", () => syncScrollBetween(zhBody, enBody));
+      enBody.addEventListener("scroll", () => syncScrollBetween(enBody, zhBody));
+
       async function renderSelection() {
         if (!state.selected) return;
 
         const { company, english, chinese, name } = state.selected;
+        selectedTitle.textContent = name;
         selectedPath.textContent = `${company}/${english}${chinese ? `  ⇄  ${company}/${chinese}` : ""}`;
         zhFileName.textContent = chinese ? `${company}/${chinese}` : "暂无中文版本";
         enFileName.textContent = `${company}/${english}`;
@@ -1377,7 +1676,7 @@
         if (chinese) {
           try {
             const zhText = await loadFile(company, chinese);
-            zhStatus.textContent = "Loaded";
+            updatePaneStatus(zhStatus, "Loaded", "loaded");
             zhBody.innerHTML = renderMarkdown(zhText);
           } catch (error) {
             setPaneError(zhBody, zhStatus, "中文文档读取失败", error);
@@ -1386,11 +1685,15 @@
 
         try {
           const enText = await loadFile(company, english);
-          enStatus.textContent = "Loaded";
+          updatePaneStatus(enStatus, "Loaded", "loaded");
           enBody.innerHTML = renderMarkdown(enText);
         } catch (error) {
           setPaneError(enBody, enStatus, "英文文档读取失败", error);
         }
+
+        attachLinkedHighlights();
+        zhBody.scrollTop = 0;
+        enBody.scrollTop = 0;
       }
 
       function syncViewMode() {
@@ -1399,18 +1702,51 @@
         viewEnBtn.classList.toggle("is-active", state.viewMode === "en");
 
         if (state.viewMode === "both") {
-          panes.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
           zhPane.hidden = false;
           enPane.hidden = false;
         } else if (state.viewMode === "zh") {
-          panes.style.gridTemplateColumns = "1fr";
           zhPane.hidden = false;
           enPane.hidden = true;
         } else {
-          panes.style.gridTemplateColumns = "1fr";
           zhPane.hidden = true;
           enPane.hidden = false;
         }
+
+        syncIndicator.textContent =
+          state.viewMode === "both"
+            ? state.syncScroll
+              ? "双栏联动已启用"
+              : "双栏联动已关闭"
+            : "当前为单栏专注阅读";
+      }
+
+      function syncLayoutMode() {
+        layoutSplitBtn.classList.toggle("is-active", state.layoutMode === "split");
+        layoutZhFocusBtn.classList.toggle("is-active", state.layoutMode === "zh-focus");
+        layoutEnFocusBtn.classList.toggle("is-active", state.layoutMode === "en-focus");
+        panes.classList.remove("layout-split", "layout-zh-focus", "layout-en-focus");
+        panes.classList.add(
+          state.layoutMode === "zh-focus"
+            ? "layout-zh-focus"
+            : state.layoutMode === "en-focus"
+              ? "layout-en-focus"
+              : "layout-split"
+        );
+        if (state.layoutMode === "zh-focus" && state.viewMode === "both") {
+          syncIndicator.textContent = state.syncScroll ? "中文主视图 + 联动滚动" : "中文主视图";
+        } else if (state.layoutMode === "en-focus" && state.viewMode === "both") {
+          syncIndicator.textContent = state.syncScroll ? "英文主视图 + 联动滚动" : "英文主视图";
+        }
+      }
+
+      function syncScrollButton() {
+        syncScrollBtn.classList.toggle("is-active", state.syncScroll);
+      }
+
+      function syncFilterMode() {
+        filterAllBtn.classList.toggle("is-active", state.filterMode === "all");
+        filterTranslatedBtn.classList.toggle("is-active", state.filterMode === "translated");
+        filterPendingBtn.classList.toggle("is-active", state.filterMode === "pending");
       }
 
       searchInput.addEventListener("input", (event) => {
@@ -1418,9 +1754,28 @@
         renderSidebar();
       });
 
+      filterAllBtn.addEventListener("click", () => {
+        state.filterMode = "all";
+        syncFilterMode();
+        renderSidebar();
+      });
+
+      filterTranslatedBtn.addEventListener("click", () => {
+        state.filterMode = "translated";
+        syncFilterMode();
+        renderSidebar();
+      });
+
+      filterPendingBtn.addEventListener("click", () => {
+        state.filterMode = "pending";
+        syncFilterMode();
+        renderSidebar();
+      });
+
       viewBothBtn.addEventListener("click", () => {
         state.viewMode = "both";
         syncViewMode();
+        syncLayoutMode();
       });
 
       viewZhBtn.addEventListener("click", () => {
@@ -1431,6 +1786,32 @@
       viewEnBtn.addEventListener("click", () => {
         state.viewMode = "en";
         syncViewMode();
+      });
+
+      layoutSplitBtn.addEventListener("click", () => {
+        state.layoutMode = "split";
+        syncLayoutMode();
+      });
+
+      layoutZhFocusBtn.addEventListener("click", () => {
+        state.layoutMode = "zh-focus";
+        state.viewMode = "both";
+        syncViewMode();
+        syncLayoutMode();
+      });
+
+      layoutEnFocusBtn.addEventListener("click", () => {
+        state.layoutMode = "en-focus";
+        state.viewMode = "both";
+        syncViewMode();
+        syncLayoutMode();
+      });
+
+      syncScrollBtn.addEventListener("click", () => {
+        state.syncScroll = !state.syncScroll;
+        syncScrollButton();
+        syncViewMode();
+        syncLayoutMode();
       });
 
       mobileToggle.addEventListener("click", () => {
@@ -1454,6 +1835,9 @@
 
       renderSidebar();
       syncViewMode();
+      syncLayoutMode();
+      syncScrollButton();
+      syncFilterMode();
       renderSelection();
     </script>
   </body>
