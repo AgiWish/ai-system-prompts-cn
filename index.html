@@ -849,10 +849,6 @@
         grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.28fr);
       }
 
-      .panes.layout-paired {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
       .pane {
         min-height: 0;
         display: flex;
@@ -921,46 +917,6 @@
         padding: 22px 24px 34px;
         overflow: auto;
         overscroll-behavior: contain;
-      }
-
-      .paired-body {
-        padding: 0;
-      }
-
-      .paired-grid {
-        display: grid;
-        gap: 0;
-      }
-
-      .paired-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        border-bottom: 1px solid rgba(65, 47, 31, 0.08);
-      }
-
-      .paired-row.is-active-anchor {
-        background: linear-gradient(90deg, rgba(30, 99, 90, 0.08), rgba(199, 161, 72, 0.06));
-      }
-
-      .paired-cell {
-        min-width: 0;
-        padding: 18px 22px 12px;
-      }
-
-      .paired-cell + .paired-cell {
-        border-left: 1px solid rgba(65, 47, 31, 0.08);
-      }
-
-      .paired-cell .doc-block {
-        margin-bottom: 0;
-        padding: 0;
-        border-radius: 14px;
-      }
-
-      .paired-empty {
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.7;
       }
 
       .empty-state {
@@ -1187,15 +1143,8 @@
         .panes,
         .panes.layout-split,
         .panes.layout-zh-focus,
-        .panes.layout-en-focus,
-        .panes.layout-paired,
-        .paired-row {
+        .panes.layout-en-focus {
           grid-template-columns: 1fr;
-        }
-
-        .paired-cell + .paired-cell {
-          border-left: 0;
-          border-top: 1px solid rgba(65, 47, 31, 0.08);
         }
 
         .pane-body {
@@ -1344,7 +1293,6 @@
               <div class="control-label">阅读视图</div>
               <div class="button-row">
                 <button class="tool-btn is-active" id="viewBothBtn" type="button">双栏</button>
-                <button class="tool-btn" id="viewPairBtn" type="button">逐段</button>
                 <button class="tool-btn" id="viewZhBtn" type="button">中文</button>
                 <button class="tool-btn" id="viewEnBtn" type="button">英文</button>
               </div>
@@ -1477,23 +1425,6 @@
               </div>
             </article>
 
-            <article class="pane" id="pairPane" hidden>
-              <header class="pane-head">
-                <div>
-                  <div class="pane-label">Paired Compare</div>
-                  <div class="pane-file" id="pairFileName">未选择文件</div>
-                </div>
-                <div class="pane-status" id="pairStatus">等待选择</div>
-              </header>
-              <div class="pane-body paired-body" id="pairBody">
-                <div class="empty-state">
-                  <div>
-                    <strong>逐段对照</strong>
-                    选择文档后按段落生成中英对照行，只使用一个滚动条。
-                  </div>
-                </div>
-              </div>
-            </article>
           </section>
         </section>
       </main>
@@ -1683,7 +1614,6 @@
       const enPane = document.getElementById("enPane");
       const panes = document.getElementById("panes");
       const viewBothBtn = document.getElementById("viewBothBtn");
-      const viewPairBtn = document.getElementById("viewPairBtn");
       const viewZhBtn = document.getElementById("viewZhBtn");
       const viewEnBtn = document.getElementById("viewEnBtn");
       const layoutSplitBtn = document.getElementById("layoutSplitBtn");
@@ -1691,10 +1621,6 @@
       const layoutEnFocusBtn = document.getElementById("layoutEnFocusBtn");
       const syncScrollBtn = document.getElementById("syncScrollBtn");
       const syncIndicator = document.getElementById("syncIndicator");
-      const pairPane = document.getElementById("pairPane");
-      const pairBody = document.getElementById("pairBody");
-      const pairFileName = document.getElementById("pairFileName");
-      const pairStatus = document.getElementById("pairStatus");
       const jumpTopBtn = document.getElementById("jumpTopBtn");
       const jumpMiddleBtn = document.getElementById("jumpMiddleBtn");
       const jumpBottomBtn = document.getElementById("jumpBottomBtn");
@@ -1965,15 +1891,20 @@
             continue;
           }
 
-          if (/^```/.test(line)) {
-            const fence = line.slice(3).trim();
+          const codeFence = line.match(/^```(.*)$/);
+          const looseCodeFence = line.match(/^`([A-Za-z][A-Za-z0-9_-]*)\s*$/);
+          if (codeFence || looseCodeFence) {
+            const fence = codeFence ? codeFence[1].trim() : looseCodeFence[1].trim();
             const block = [];
             i += 1;
-            while (i < lines.length && !/^```/.test(lines[i])) {
+            const closesFence = codeFence
+              ? (value) => /^```/.test(value)
+              : (value) => value.trim() === "`";
+            while (i < lines.length && !closesFence(lines[i])) {
               block.push(lines[i]);
               i += 1;
             }
-            i += 1;
+            if (i < lines.length) i += 1;
             pushBlock(
               "code",
               `<pre><code class="language-${escapeHtml(fence)}">${escapeHtml(block.join("\n"))}</code></pre>`,
@@ -2036,6 +1967,7 @@
             lines[i].trim() &&
             !/^(#{1,6})\s+/.test(lines[i]) &&
             !/^```/.test(lines[i]) &&
+            !/^`[A-Za-z][A-Za-z0-9_-]*\s*$/.test(lines[i]) &&
             !/^>\s?/.test(lines[i]) &&
             !/^[-*+]\s+/.test(lines[i]) &&
             !/^\d+\.\s+/.test(lines[i]) &&
@@ -2112,7 +2044,6 @@
       function refreshBlockCache() {
         state.blockCache.set(zhBody, Array.from(zhBody.querySelectorAll("[data-block-index]")));
         state.blockCache.set(enBody, Array.from(enBody.querySelectorAll("[data-block-index]")));
-        state.blockCache.set(pairBody, Array.from(pairBody.querySelectorAll("[data-pair-index]")));
       }
 
       function syncActiveBlocks() {
@@ -2120,9 +2051,6 @@
           for (const block of container.querySelectorAll("[data-block-index]")) {
             block.classList.toggle("is-active-anchor", block.dataset.blockIndex === state.activeBlockIndex);
           }
-        }
-        for (const row of pairBody.querySelectorAll("[data-pair-index]")) {
-          row.classList.toggle("is-active-anchor", row.dataset.pairIndex === state.activeBlockIndex);
         }
       }
 
@@ -2134,58 +2062,14 @@
 
       function scrollPairToIndex(index) {
         state.activeBlockIndex = String(index);
-        for (const container of [zhBody, enBody, pairBody]) {
+        for (const container of [zhBody, enBody]) {
           const target = container.querySelector(`[data-block-index="${index}"]`);
-          const pairTarget = container.querySelector(`[data-pair-index="${index}"]`);
           if (target) {
             target.scrollIntoView({ block: "center", behavior: "smooth" });
-          } else if (pairTarget) {
-            pairTarget.scrollIntoView({ block: "center", behavior: "smooth" });
           }
         }
         syncOutlineState();
         syncActiveBlocks();
-      }
-
-      function renderPairedCompare() {
-        const zhBlocks = state.blockCache.get(zhBody) || [];
-        const enBlocks = state.blockCache.get(enBody) || [];
-        const count = Math.max(zhBlocks.length, enBlocks.length);
-        if (!count) {
-          pairBody.innerHTML = `
-            <div class="empty-state">
-              <div>
-                <strong>暂无可对照内容</strong>
-                当前文档还没有可拆分的段落区块。
-              </div>
-            </div>
-          `;
-          updatePaneStatus(pairStatus, "Unavailable", "");
-          return;
-        }
-
-        const rows = [];
-        for (let index = 0; index < count; index += 1) {
-          const zhBlock = zhBlocks[index];
-          const enBlock = enBlocks[index];
-          rows.push(`
-            <section class="paired-row" data-pair-index="${index}">
-              <div class="paired-cell paired-cell-zh">
-                ${zhBlock ? zhBlock.outerHTML : '<div class="paired-empty">中文无对应段落</div>'}
-              </div>
-              <div class="paired-cell paired-cell-en">
-                ${enBlock ? enBlock.outerHTML : '<div class="paired-empty">英文无对应段落</div>'}
-              </div>
-            </section>
-          `);
-        }
-        pairBody.innerHTML = `<div class="paired-grid">${rows.join("")}</div>`;
-        for (const row of pairBody.querySelectorAll("[data-pair-index]")) {
-          row.addEventListener("click", () => {
-            scrollPairToIndex(row.dataset.pairIndex);
-          });
-        }
-        updatePaneStatus(pairStatus, "Aligned", "loaded");
       }
 
       function buildOutline() {
@@ -2243,7 +2127,7 @@
             active = block;
           }
         }
-        const activeIndex = active.dataset.pairIndex || active.dataset.blockIndex;
+        const activeIndex = active.dataset.blockIndex;
         if (activeIndex !== state.activeBlockIndex) {
           state.activeBlockIndex = activeIndex;
           syncOutlineState();
@@ -2267,9 +2151,7 @@
 
       function jumpToProgress(ratio) {
         const targets =
-          state.viewMode === "pair"
-            ? [pairBody]
-            : state.viewMode === "zh"
+          state.viewMode === "zh"
               ? [zhBody]
               : state.viewMode === "en"
                 ? [enBody]
@@ -2358,10 +2240,6 @@
         if (syncScrollBetween.locked) return;
         scheduleActiveBlockUpdate(enBody, true);
       });
-      pairBody.addEventListener("scroll", () => {
-        scheduleActiveBlockUpdate(pairBody, false);
-      });
-
       async function renderSelection() {
         if (!state.selected) return;
 
@@ -2370,7 +2248,6 @@
         selectedPath.textContent = `${company}/${english}${chinese ? `  ⇄  ${company}/${chinese}` : ""}`;
         zhFileName.textContent = chinese ? `${company}/${chinese}` : "暂无中文版本";
         enFileName.textContent = `${company}/${english}`;
-        pairFileName.textContent = chinese ? `${company}/${chinese}  ⇄  ${company}/${english}` : `${company}/${english}`;
 
         if (chinese) {
           setPaneLoading(zhBody, zhStatus, "Chinese");
@@ -2379,7 +2256,6 @@
         }
 
         setPaneLoading(enBody, enStatus, "English");
-        setPaneLoading(pairBody, pairStatus, "Paired Compare");
 
         if (chinese) {
           try {
@@ -2407,8 +2283,6 @@
         }
 
         refreshBlockCache();
-        renderPairedCompare();
-        refreshBlockCache();
         attachLinkedHighlights();
         state.activeBlockIndex = "0";
         buildOutline();
@@ -2416,31 +2290,22 @@
         updateSelectionSignals(state.selected, state.lastZhText, state.lastEnText);
         zhBody.scrollTop = 0;
         enBody.scrollTop = 0;
-        pairBody.scrollTop = 0;
       }
 
       function syncViewMode() {
         viewBothBtn.classList.toggle("is-active", state.viewMode === "both");
-        viewPairBtn.classList.toggle("is-active", state.viewMode === "pair");
         viewZhBtn.classList.toggle("is-active", state.viewMode === "zh");
         viewEnBtn.classList.toggle("is-active", state.viewMode === "en");
 
         if (state.viewMode === "both") {
           zhPane.hidden = false;
           enPane.hidden = false;
-          pairPane.hidden = true;
-        } else if (state.viewMode === "pair") {
-          zhPane.hidden = true;
-          enPane.hidden = true;
-          pairPane.hidden = false;
         } else if (state.viewMode === "zh") {
           zhPane.hidden = false;
           enPane.hidden = true;
-          pairPane.hidden = true;
         } else {
           zhPane.hidden = true;
           enPane.hidden = false;
-          pairPane.hidden = true;
         }
 
         syncIndicator.textContent =
@@ -2448,20 +2313,16 @@
             ? state.syncScroll
               ? "双栏按段落同步"
               : "双栏同步已关闭"
-            : state.viewMode === "pair"
-              ? "逐段对照使用单滚动条"
-              : "当前为单栏专注阅读";
+            : "当前为单栏专注阅读";
       }
 
       function syncLayoutMode() {
         layoutSplitBtn.classList.toggle("is-active", state.layoutMode === "split");
         layoutZhFocusBtn.classList.toggle("is-active", state.layoutMode === "zh-focus");
         layoutEnFocusBtn.classList.toggle("is-active", state.layoutMode === "en-focus");
-        panes.classList.remove("layout-split", "layout-zh-focus", "layout-en-focus", "layout-paired");
+        panes.classList.remove("layout-split", "layout-zh-focus", "layout-en-focus");
         panes.classList.add(
-          state.viewMode === "pair"
-            ? "layout-paired"
-            : state.layoutMode === "zh-focus"
+          state.layoutMode === "zh-focus"
             ? "layout-zh-focus"
             : state.layoutMode === "en-focus"
               ? "layout-en-focus"
@@ -2529,12 +2390,6 @@
 
       viewBothBtn.addEventListener("click", () => {
         state.viewMode = "both";
-        syncViewMode();
-        syncLayoutMode();
-      });
-
-      viewPairBtn.addEventListener("click", () => {
-        state.viewMode = "pair";
         syncViewMode();
         syncLayoutMode();
       });
