@@ -1860,7 +1860,7 @@
         let index = 1;
         while (index < lines.length && !lines[index].trim()) index += 1;
         let metadataLines = 0;
-        while (index < lines.length && /^>\s*(原文|来源路径|翻译方式|翻译日期)[:：]/.test(lines[index])) {
+        while (index < lines.length && /^>\s*(原文|来源路径|翻译方式|翻译日期|整理日期)[:：]/.test(lines[index])) {
           metadataLines += 1;
           index += 1;
         }
