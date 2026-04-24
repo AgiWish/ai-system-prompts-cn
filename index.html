@@ -25,7 +25,7 @@
         --radius-xl: 28px;
         --radius-lg: 22px;
         --radius-md: 16px;
-        --sidebar-width: 330px;
+        --sidebar-width: 220px;
       }
 
       * {
@@ -42,9 +42,8 @@
         font-family: "Source Han Serif SC", "Iowan Old Style", "Songti SC", serif;
         color: var(--text);
         background:
-          radial-gradient(circle at top left, rgba(199, 161, 72, 0.22), transparent 32%),
-          radial-gradient(circle at 85% 10%, rgba(30, 99, 90, 0.15), transparent 24%),
-          linear-gradient(135deg, var(--bg) 0%, #f4efe6 48%, var(--bg-deep) 100%);
+          radial-gradient(circle at 100% 0%, rgba(169, 79, 45, 0.1), transparent 26%),
+          linear-gradient(135deg, #f1ece3 0%, #ebe3d7 100%);
         overflow: hidden;
       }
 
@@ -63,6 +62,7 @@
             rgba(60, 45, 28, 0.022) 53px
           );
         mix-blend-mode: multiply;
+        opacity: 0.55;
       }
 
       .app {
@@ -72,12 +72,21 @@
         position: relative;
       }
 
+      body.catalog-collapsed .app {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      body.catalog-collapsed .sidebar,
+      body.toolbar-collapsed .inspector {
+        display: none;
+      }
+
       .sidebar {
         position: relative;
         display: flex;
         flex-direction: column;
         border-right: 1px solid var(--line);
-        padding: 24px 18px 18px;
+        padding: 14px 12px 12px;
         background:
           linear-gradient(180deg, rgba(255, 252, 247, 0.9), rgba(243, 236, 226, 0.78)),
           rgba(255, 255, 255, 0.2);
@@ -94,7 +103,7 @@
       }
 
       .brand {
-        padding: 0 8px 16px;
+        padding: 0 6px 10px;
         animation: rise 0.7s ease both;
       }
 
@@ -116,27 +125,23 @@
       }
 
       .brand-title {
-        margin: 8px 0 10px;
+        margin: 6px 0 7px;
         font-family: "Didot", "Bodoni 72", "STSong", serif;
-        font-size: clamp(28px, 3.4vw, 42px);
+        font-size: clamp(24px, 2.2vw, 30px);
         line-height: 0.95;
         letter-spacing: -0.04em;
       }
 
       .brand-note {
-        margin: 0;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.65;
-        max-width: 28ch;
+        display: none;
       }
 
       .search-panel,
       .meta-panel {
-        margin: 0 4px 14px;
-        padding: 14px;
+        margin: 0 2px 8px;
+        padding: 10px;
         border: 1px solid var(--line);
-        border-radius: var(--radius-lg);
+        border-radius: 16px;
         background: rgba(255, 251, 244, 0.72);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
       }
@@ -144,7 +149,7 @@
       .label {
         display: block;
         color: var(--muted);
-        margin-bottom: 10px;
+        margin-bottom: 7px;
       }
 
       .search-input {
@@ -152,8 +157,8 @@
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.78);
         color: var(--text);
-        padding: 12px 14px;
-        border-radius: 14px;
+        padding: 9px 11px;
+        border-radius: 12px;
         outline: none;
         font: inherit;
         transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
@@ -166,15 +171,15 @@
       }
 
       .filter-row {
-        margin-top: 12px;
+        margin-top: 8px;
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
       }
 
       .mini-btn {
-        min-height: 34px;
-        padding: 0 10px;
+        min-height: 28px;
+        padding: 0 8px;
         border-radius: 999px;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.68);
@@ -199,44 +204,44 @@
       .stats {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        gap: 6px;
       }
 
       .stat-card {
-        border-radius: 16px;
-        padding: 12px;
+        border-radius: 12px;
+        padding: 8px 6px;
         background: rgba(255, 255, 255, 0.68);
         border: 1px solid rgba(53, 43, 33, 0.08);
       }
 
       .stat-card strong {
         display: block;
-        font-size: 22px;
+        font-size: 17px;
         font-family: "Didot", "Bodoni 72", serif;
       }
 
       .stat-card span {
-        font-size: 12px;
+        font-size: 10px;
         color: var(--muted);
       }
 
       .company-list {
         flex: 1;
         overflow: auto;
-        padding: 4px 4px 20px;
+        padding: 2px 2px 16px;
         scrollbar-width: thin;
       }
 
       .company {
-        margin-bottom: 10px;
+        margin-bottom: 7px;
       }
 
       .company-header {
         width: 100%;
         border: 1px solid var(--line);
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(247, 239, 228, 0.84));
-        padding: 14px;
-        border-radius: 18px;
+        padding: 10px 11px;
+        border-radius: 15px;
         display: grid;
         grid-template-columns: 1fr auto;
         gap: 10px;
@@ -258,7 +263,7 @@
 
       .company-name {
         font-family: "Avenir Next Condensed", "Helvetica Neue", sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         letter-spacing: 0.02em;
       }
 
@@ -270,8 +275,8 @@
       }
 
       .company-arrow {
-        width: 34px;
-        height: 34px;
+        width: 28px;
+        height: 28px;
         display: grid;
         place-items: center;
         border-radius: 999px;
@@ -286,8 +291,8 @@
       }
 
       .file-tree {
-        margin: 8px 0 0;
-        padding: 8px 6px 2px 16px;
+        margin: 6px 0 0;
+        padding: 6px 4px 1px 12px;
         border-left: 1px solid rgba(53, 43, 33, 0.12);
       }
 
@@ -300,8 +305,8 @@
         content: "";
         position: absolute;
         top: 19px;
-        left: -16px;
-        width: 10px;
+        left: -12px;
+        width: 8px;
         border-top: 1px solid rgba(53, 43, 33, 0.12);
       }
 
@@ -310,8 +315,8 @@
         text-align: left;
         border: 1px solid transparent;
         background: transparent;
-        padding: 11px 12px;
-        border-radius: 14px;
+        padding: 8px 9px;
+        border-radius: 12px;
         cursor: pointer;
         color: var(--text);
         transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
@@ -332,7 +337,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1.45;
       }
 
@@ -348,15 +353,15 @@
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
-        margin-top: 7px;
+        margin-top: 5px;
       }
 
       .pill {
         font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
-        font-size: 11px;
+        font-size: 10px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        padding: 4px 8px;
+        padding: 3px 7px;
         border-radius: 999px;
         border: 1px solid var(--line);
         color: var(--muted);
@@ -378,28 +383,32 @@
       .main {
         display: grid;
         grid-template-rows: auto minmax(0, 1fr);
-        gap: 16px;
-        padding: 18px;
+        gap: 8px;
+        padding: 8px;
         overflow: hidden;
       }
 
       .inspector {
         border: 1px solid var(--line);
-        border-radius: var(--radius-xl);
-        background:
-          radial-gradient(circle at 92% 0%, rgba(169, 79, 45, 0.16), transparent 28%),
-          radial-gradient(circle at 0% 100%, rgba(30, 99, 90, 0.14), transparent 24%),
-          linear-gradient(135deg, rgba(255, 252, 247, 0.92), rgba(246, 239, 230, 0.82));
-        box-shadow: var(--shadow);
-        overflow: hidden;
+        border-radius: 18px;
+        background: rgba(255, 252, 247, 0.78);
+        box-shadow: 0 14px 34px rgba(45, 31, 18, 0.08);
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        overflow: visible;
+        backdrop-filter: blur(16px);
       }
 
       .inspector-main {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 18px;
-        padding: 18px 20px 14px;
-        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        gap: 10px;
+        padding: 0;
+        border-bottom: 0;
       }
 
       .selection-block {
@@ -407,23 +416,29 @@
       }
 
       .selection-title {
-        margin: 8px 0 6px;
-        font-family: "Didot", "Bodoni 72", "STSong", serif;
-        font-size: clamp(26px, 3vw, 40px);
-        line-height: 0.98;
-        letter-spacing: -0.04em;
+        margin: 0;
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        font-size: clamp(17px, 1.45vw, 22px);
+        line-height: 1.05;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .selection-path {
         display: block;
         margin: 0;
         color: var(--muted);
-        font-size: 13px;
-        line-height: 1.55;
-        word-break: break-all;
+        font-size: 11px;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .inspector-note {
+        display: none;
         margin-top: 8px;
         color: #5a5147;
         font-size: 14px;
@@ -435,16 +450,42 @@
         display: none;
       }
 
+      .chrome-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .floating-chrome {
+        position: fixed;
+        z-index: 40;
+        right: 18px;
+        bottom: 18px;
+        display: none;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 252, 247, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      body.catalog-collapsed .floating-chrome,
+      body.toolbar-collapsed .floating-chrome {
+        display: flex;
+      }
+
       .quick-stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(92px, 1fr));
-        gap: 10px;
+        display: none;
+        grid-template-columns: repeat(3, minmax(70px, 1fr));
+        gap: 7px;
         align-self: start;
       }
 
       .quick-card {
-        padding: 12px 14px;
-        border-radius: 16px;
+        padding: 8px 9px;
+        border-radius: 12px;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.6);
       }
@@ -452,47 +493,53 @@
       .quick-card strong {
         display: block;
         font-family: "Didot", "Bodoni 72", serif;
-        font-size: 24px;
+        font-size: 18px;
       }
 
       .quick-card span {
-        font-size: 12px;
+        font-size: 10px;
         color: var(--muted);
       }
 
       .inspector-controls {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        padding: 14px 20px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 0;
       }
 
       .control-panel,
       .method-panel {
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.52);
-        padding: 14px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+      }
+
+      .method-panel {
+        display: none;
       }
 
       .control-label,
       .method-kicker {
+        display: none;
         color: var(--muted);
-        margin-bottom: 10px;
+        margin-bottom: 7px;
       }
 
       .button-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
       }
 
       .tool-btn {
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.72);
-        border-radius: 14px;
-        min-height: 42px;
-        padding: 0 14px;
+        background: rgba(255, 255, 255, 0.64);
+        border-radius: 999px;
+        min-height: 30px;
+        padding: 0 11px;
         cursor: pointer;
         font: inherit;
         color: var(--text);
@@ -500,7 +547,7 @@
       }
 
       .tool-btn:hover {
-        transform: translateY(-1px);
+        transform: none;
         border-color: rgba(169, 79, 45, 0.3);
         background: rgba(255, 255, 255, 0.92);
       }
@@ -514,24 +561,25 @@
       .method-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
+        gap: 7px;
       }
 
       .method-card {
         min-height: 100%;
-        padding: 12px;
-        border-radius: 16px;
+        padding: 8px 9px;
+        border-radius: 12px;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(245, 239, 230, 0.78));
         border: 1px solid rgba(53, 43, 33, 0.08);
       }
 
       .method-card strong {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 0;
         font-size: 13px;
       }
 
       .method-card p {
+        display: none;
         margin: 0;
         color: var(--muted);
         font-size: 12px;
@@ -539,8 +587,9 @@
       }
 
       .warning {
-        margin: 0 20px 18px;
-        padding: 13px 15px;
+        grid-column: 1 / -1;
+        margin: 0;
+        padding: 9px 11px;
         border-radius: 16px;
         border: 1px solid rgba(143, 103, 50, 0.18);
         background: rgba(199, 161, 72, 0.14);
@@ -552,16 +601,20 @@
       .workspace {
         min-height: 0;
         display: grid;
-        grid-template-rows: auto minmax(0, 1fr);
-        gap: 12px;
+        grid-template-rows: minmax(0, 1fr);
+        gap: 6px;
+      }
+
+      body.toolbar-collapsed .main {
+        grid-template-rows: minmax(0, 1fr);
       }
 
       .compare-meta {
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 0 2px;
+        padding: 0 2px 2px;
       }
 
       .compare-caption {
@@ -575,16 +628,17 @@
       }
 
       .selection-dashboard {
-        display: grid;
+        display: none;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
+        gap: 8px;
       }
 
       .outline-bar {
-        display: grid;
-        grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
-        gap: 12px;
+        display: none;
+        grid-template-columns: minmax(142px, 170px) minmax(0, 1fr);
+        gap: 8px;
         align-items: start;
+        min-height: 0;
       }
 
       .outline-intro,
@@ -596,16 +650,17 @@
       }
 
       .outline-intro {
-        padding: 14px 15px;
+        padding: 8px 10px;
       }
 
       .outline-intro strong {
         display: block;
-        margin: 4px 0 6px;
-        font-size: 16px;
+        margin: 2px 0 0;
+        font-size: 13px;
       }
 
       .outline-intro p {
+        display: none;
         margin: 0;
         color: var(--muted);
         font-size: 12px;
@@ -613,7 +668,7 @@
       }
 
       .outline-track {
-        padding: 10px;
+        padding: 7px;
       }
 
       .outline-list {
@@ -625,15 +680,15 @@
 
       .outline-chip {
         flex: 0 0 auto;
-        min-height: 38px;
-        padding: 0 12px;
+        min-height: 30px;
+        padding: 0 10px;
         border-radius: 999px;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.66);
         color: var(--muted);
         cursor: pointer;
         font: inherit;
-        font-size: 12px;
+        font-size: 11px;
         line-height: 1.2;
         transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
       }
@@ -652,8 +707,8 @@
       }
 
       .signal-card {
-        padding: 14px 15px;
-        border-radius: 18px;
+        padding: 8px 10px;
+        border-radius: 14px;
         border: 1px solid var(--line);
         background: rgba(255, 252, 247, 0.68);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
@@ -661,16 +716,20 @@
 
       .signal-card strong {
         display: block;
-        margin: 3px 0 6px;
-        font-size: 16px;
+        margin: 2px 0 2px;
+        font-size: 13px;
         line-height: 1.25;
       }
 
       .signal-card span {
         display: block;
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.55;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .signal-card > span {
+        display: none;
       }
 
       .signal-meta {
@@ -678,18 +737,18 @@
         align-items: baseline;
         justify-content: space-between;
         gap: 8px;
-        margin-top: 8px;
+        margin-top: 3px;
       }
 
       .signal-metric {
         font-family: "Didot", "Bodoni 72", serif;
-        font-size: 26px;
+        font-size: 18px;
         line-height: 1;
       }
 
       .coverage-track {
-        height: 8px;
-        margin-top: 10px;
+        height: 5px;
+        margin-top: 5px;
         border-radius: 999px;
         background: rgba(65, 47, 31, 0.08);
         overflow: hidden;
@@ -711,8 +770,8 @@
       }
 
       .jump-btn {
-        min-height: 34px;
-        padding: 0 12px;
+        min-height: 30px;
+        padding: 0 10px;
         border-radius: 999px;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.66);
@@ -751,7 +810,7 @@
         min-height: 0;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        gap: 10px;
       }
 
       .panes.layout-split {
@@ -768,11 +827,13 @@
 
       .pane {
         min-height: 0;
-        border-radius: var(--radius-xl);
+        display: flex;
+        flex-direction: column;
+        border-radius: 18px;
         border: 1px solid var(--line);
-        background: linear-gradient(180deg, rgba(255, 252, 248, 0.86), rgba(248, 241, 231, 0.76));
+        background: rgba(255, 253, 248, 0.84);
         overflow: hidden;
-        box-shadow: var(--shadow);
+        box-shadow: 0 18px 44px rgba(45, 31, 18, 0.1);
       }
 
       .pane-head {
@@ -780,9 +841,9 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 14px 18px;
+        padding: 8px 14px;
         border-bottom: 1px solid var(--line);
-        background: rgba(255, 250, 244, 0.84);
+        background: rgba(255, 252, 247, 0.72);
         backdrop-filter: blur(12px);
       }
 
@@ -791,8 +852,8 @@
       }
 
       .pane-file {
-        margin-top: 4px;
-        font-size: 13px;
+        margin-top: 2px;
+        font-size: 12px;
         color: var(--text);
         word-break: break-all;
       }
@@ -826,10 +887,12 @@
       }
 
       .pane-body {
-        height: calc(100vh - 290px);
-        padding: 20px 18px 30px;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        padding: 22px 24px 34px;
         overflow: auto;
-        scroll-behavior: smooth;
+        overscroll-behavior: contain;
       }
 
       .empty-state {
@@ -999,9 +1062,12 @@
       }
 
       @media (max-width: 1180px) {
-        .inspector-main,
-        .inspector-controls {
+        .inspector {
           grid-template-columns: 1fr;
+        }
+
+        .inspector-controls {
+          justify-content: flex-start;
         }
 
         .quick-stats {
@@ -1009,7 +1075,7 @@
         }
 
         .selection-dashboard {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
         .outline-bar {
@@ -1017,7 +1083,7 @@
         }
 
         .method-grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
 
@@ -1069,7 +1135,7 @@
         }
 
         .selection-title {
-          font-size: 28px;
+          font-size: 19px;
         }
 
         .quick-stats {
@@ -1080,10 +1146,19 @@
           grid-template-columns: 1fr;
         }
 
-        .inspector-main,
+        .inspector-controls,
+        .method-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .inspector-main {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
         .inspector-controls {
-          padding-left: 16px;
-          padding-right: 16px;
+          padding-left: 0;
+          padding-right: 0;
         }
 
         .warning {
@@ -1169,6 +1244,10 @@
                 联动滚动和段落联动高亮。
               </p>
             </div>
+            <div class="chrome-actions">
+              <button class="tool-btn" id="toggleCatalogBtn" type="button">目录</button>
+              <button class="tool-btn" id="toggleToolbarBtn" type="button">专注</button>
+            </div>
             <div class="quick-stats">
               <div class="quick-card">
                 <strong id="companyCount">0</strong>
@@ -1189,19 +1268,19 @@
             <section class="control-panel">
               <div class="control-label">阅读视图</div>
               <div class="button-row">
-                <button class="tool-btn is-active" id="viewBothBtn" type="button">对照阅读</button>
-                <button class="tool-btn" id="viewZhBtn" type="button">只看中文</button>
-                <button class="tool-btn" id="viewEnBtn" type="button">只看英文</button>
+                <button class="tool-btn is-active" id="viewBothBtn" type="button">双栏</button>
+                <button class="tool-btn" id="viewZhBtn" type="button">中文</button>
+                <button class="tool-btn" id="viewEnBtn" type="button">英文</button>
               </div>
             </section>
 
             <section class="control-panel">
               <div class="control-label">翻译方式</div>
               <div class="button-row">
-                <button class="tool-btn is-active" id="layoutSplitBtn" type="button">镜像对照</button>
-                <button class="tool-btn" id="layoutZhFocusBtn" type="button">中文主视图</button>
-                <button class="tool-btn" id="layoutEnFocusBtn" type="button">英文主视图</button>
-                <button class="tool-btn is-active" id="syncScrollBtn" type="button">联动滚动</button>
+                <button class="tool-btn is-active" id="layoutSplitBtn" type="button">均分</button>
+                <button class="tool-btn" id="layoutZhFocusBtn" type="button">中宽</button>
+                <button class="tool-btn" id="layoutEnFocusBtn" type="button">英宽</button>
+                <button class="tool-btn is-active" id="syncScrollBtn" type="button">同步</button>
               </div>
             </section>
 
@@ -1324,6 +1403,10 @@
           </section>
         </section>
       </main>
+      <div class="floating-chrome" aria-label="阅读界面设置">
+        <button class="tool-btn" id="floatCatalogBtn" type="button">目录</button>
+        <button class="tool-btn" id="floatToolbarBtn" type="button">工具条</button>
+      </div>
     </div>
 
     <script>
@@ -1460,11 +1543,12 @@
         expandedCompanies: new Set(),
         selected: null,
         viewMode: "both",
-        layoutMode: "zh-focus",
+        layoutMode: "split",
         syncScroll: true,
         filterMode: "all",
         activeBlockIndex: "0",
-        cache: new Map()
+        cache: new Map(),
+        blockCache: new Map()
       };
 
       const companyList = document.getElementById("companyList");
@@ -1516,6 +1600,10 @@
       const jumpMiddleBtn = document.getElementById("jumpMiddleBtn");
       const jumpBottomBtn = document.getElementById("jumpBottomBtn");
       const mobileToggle = document.getElementById("mobileToggle");
+      const toggleCatalogBtn = document.getElementById("toggleCatalogBtn");
+      const toggleToolbarBtn = document.getElementById("toggleToolbarBtn");
+      const floatCatalogBtn = document.getElementById("floatCatalogBtn");
+      const floatToolbarBtn = document.getElementById("floatToolbarBtn");
       const protocolWarning = document.getElementById("protocolWarning");
 
       const totals = MANIFEST.reduce(
@@ -1697,6 +1785,27 @@
         return normalized.length > limit ? `${normalized.slice(0, limit)}…` : normalized;
       }
 
+      function stripTranslationPreface(source) {
+        const normalized = source.replace(/\r\n?/g, "\n");
+        const lines = normalized.split("\n");
+        if (!/^#\s+.*(?:中文翻译|翻译整理|译文)/.test(lines[0] || "")) {
+          return source;
+        }
+
+        let index = 1;
+        while (index < lines.length && !lines[index].trim()) index += 1;
+        let metadataLines = 0;
+        while (index < lines.length && /^>\s*(原文|来源路径|翻译方式|翻译日期)[:：]/.test(lines[index])) {
+          metadataLines += 1;
+          index += 1;
+        }
+        while (index < lines.length && !lines[index].trim()) index += 1;
+        if (metadataLines >= 2 && /^---+$/.test(lines[index] || "")) {
+          return lines.slice(index + 1).join("\n").replace(/^\s+/, "");
+        }
+        return source;
+      }
+
       function renderMarkdown(source) {
         const lines = source.replace(/\r\n?/g, "\n").split("\n");
         const html = [];
@@ -1861,6 +1970,11 @@
         signalCoverageFill.style.width = `${coverage}%`;
       }
 
+      function refreshBlockCache() {
+        state.blockCache.set(zhBody, Array.from(zhBody.querySelectorAll("[data-block-index]")));
+        state.blockCache.set(enBody, Array.from(enBody.querySelectorAll("[data-block-index]")));
+      }
+
       function syncActiveBlocks() {
         for (const container of [zhBody, enBody]) {
           for (const block of container.querySelectorAll("[data-block-index]")) {
@@ -1917,7 +2031,7 @@
       }
 
       function updateActiveBlockFromScroll(source) {
-        const blocks = Array.from(source.querySelectorAll("[data-block-index]"));
+        const blocks = state.blockCache.get(source) || [];
         if (!blocks.length) return;
         const sourceTop = source.getBoundingClientRect().top;
         let active = blocks[0];
@@ -1934,6 +2048,15 @@
           syncOutlineState();
           syncActiveBlocks();
         }
+      }
+
+      function scheduleActiveBlockUpdate(source) {
+        state.pendingActiveSource = source;
+        if (state.activeUpdateFrame) return;
+        state.activeUpdateFrame = requestAnimationFrame(() => {
+          state.activeUpdateFrame = 0;
+          updateActiveBlockFromScroll(state.pendingActiveSource || zhBody);
+        });
       }
 
       function jumpToProgress(ratio) {
@@ -2029,13 +2152,39 @@
         });
       }
 
+      function applySyncedWheel(event) {
+        if (!state.syncScroll || state.viewMode !== "both") return;
+        if (event.ctrlKey) return;
+
+        const pane = event.target.closest(".pane");
+        if (!pane) return;
+        const source = pane.id === "enPane" ? enBody : zhBody;
+        const target = source === zhBody ? enBody : zhBody;
+        const sourceMax = source.scrollHeight - source.clientHeight;
+        const targetMax = target.scrollHeight - target.clientHeight;
+        if (sourceMax <= 0 || targetMax <= 0) return;
+
+        event.preventDefault();
+        const nextTop = Math.max(0, Math.min(sourceMax, source.scrollTop + event.deltaY));
+        const ratio = nextTop / sourceMax;
+        syncScrollBetween.locked = true;
+        source.scrollTop = nextTop;
+        target.scrollTop = ratio * targetMax;
+        scheduleActiveBlockUpdate(source);
+        requestAnimationFrame(() => {
+          syncScrollBetween.locked = false;
+        });
+      }
+
+      panes.addEventListener("wheel", applySyncedWheel, { passive: false });
+
       zhBody.addEventListener("scroll", () => {
         syncScrollBetween(zhBody, enBody);
-        updateActiveBlockFromScroll(zhBody);
+        scheduleActiveBlockUpdate(zhBody);
       });
       enBody.addEventListener("scroll", () => {
         syncScrollBetween(enBody, zhBody);
-        updateActiveBlockFromScroll(enBody);
+        scheduleActiveBlockUpdate(enBody);
       });
 
       async function renderSelection() {
@@ -2058,9 +2207,10 @@
         if (chinese) {
           try {
             const zhText = await loadFile(company, chinese);
+            const zhDisplayText = stripTranslationPreface(zhText);
             updatePaneStatus(zhStatus, "Loaded", "loaded");
-            zhBody.innerHTML = renderMarkdown(zhText);
-            state.lastZhText = zhText;
+            zhBody.innerHTML = renderMarkdown(zhDisplayText);
+            state.lastZhText = zhDisplayText;
           } catch (error) {
             setPaneError(zhBody, zhStatus, "中文文档读取失败", error);
             state.lastZhText = "";
@@ -2079,6 +2229,7 @@
           state.lastEnText = "";
         }
 
+        refreshBlockCache();
         attachLinkedHighlights();
         state.activeBlockIndex = "0";
         buildOutline();
@@ -2139,6 +2290,26 @@
         filterAllBtn.classList.toggle("is-active", state.filterMode === "all");
         filterTranslatedBtn.classList.toggle("is-active", state.filterMode === "translated");
         filterPendingBtn.classList.toggle("is-active", state.filterMode === "pending");
+      }
+
+      function syncChromeButtons() {
+        const catalogHidden = document.body.classList.contains("catalog-collapsed");
+        const toolbarHidden = document.body.classList.contains("toolbar-collapsed");
+        toggleCatalogBtn.textContent = catalogHidden ? "目录" : "收起目录";
+        floatCatalogBtn.textContent = catalogHidden ? "目录" : "收起目录";
+        toggleToolbarBtn.textContent = toolbarHidden ? "工具条" : "专注";
+        floatToolbarBtn.textContent = toolbarHidden ? "工具条" : "专注";
+      }
+
+      function toggleCatalog() {
+        document.body.classList.toggle("catalog-collapsed");
+        document.body.classList.remove("nav-open");
+        syncChromeButtons();
+      }
+
+      function toggleToolbar() {
+        document.body.classList.toggle("toolbar-collapsed");
+        syncChromeButtons();
       }
 
       searchInput.addEventListener("input", (event) => {
@@ -2214,9 +2385,25 @@
         document.body.classList.toggle("nav-open");
       });
 
+      toggleCatalogBtn.addEventListener("click", toggleCatalog);
+      floatCatalogBtn.addEventListener("click", toggleCatalog);
+      toggleToolbarBtn.addEventListener("click", toggleToolbar);
+      floatToolbarBtn.addEventListener("click", toggleToolbar);
+
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           document.body.classList.remove("nav-open");
+        }
+        const target = event.target;
+        const isEditing =
+          target instanceof HTMLElement &&
+          (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+        if (isEditing) return;
+        if (event.key.toLowerCase() === "c" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          toggleCatalog();
+        }
+        if (event.key.toLowerCase() === "t" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          toggleToolbar();
         }
       });
 
@@ -2234,6 +2421,7 @@
       syncLayoutMode();
       syncScrollButton();
       syncFilterMode();
+      syncChromeButtons();
       renderSelection();
     </script>
   </body>
