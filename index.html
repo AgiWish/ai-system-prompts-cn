@@ -2060,16 +2060,33 @@
         }
       }
 
-      function scrollPairToIndex(index) {
+      function clampScrollTop(container, value) {
+        const max = Math.max(0, container.scrollHeight - container.clientHeight);
+        return Math.max(0, Math.min(max, value));
+      }
+
+      function blockOffsetTop(container, block) {
+        return block.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+      }
+
+      function alignBlockToViewport(container, block, viewportOffset) {
+        container.scrollTop = clampScrollTop(container, blockOffsetTop(container, block) - viewportOffset);
+      }
+
+      function scrollPairToIndex(index, viewportOffset = 72) {
         state.activeBlockIndex = String(index);
+        syncScrollBetween.locked = true;
         for (const container of [zhBody, enBody]) {
           const target = container.querySelector(`[data-block-index="${index}"]`);
           if (target) {
-            target.scrollIntoView({ block: "center", behavior: "smooth" });
+            alignBlockToViewport(container, target, viewportOffset);
           }
         }
         syncOutlineState();
         syncActiveBlocks();
+        requestAnimationFrame(() => {
+          syncScrollBetween.locked = false;
+        });
       }
 
       function buildOutline() {
@@ -2104,10 +2121,12 @@
       function alignPeerBlock(source, index) {
         if (!state.syncScroll || state.viewMode !== "both" || syncScrollBetween.locked) return;
         const target = source === zhBody ? enBody : zhBody;
+        const sourceBlock = source.querySelector(`[data-block-index="${index}"]`);
         const peer = target.querySelector(`[data-block-index="${index}"]`);
-        if (!peer) return;
+        if (!sourceBlock || !peer) return;
         syncScrollBetween.locked = true;
-        peer.scrollIntoView({ block: "center", behavior: "auto" });
+        const sourceViewportOffset = sourceBlock.getBoundingClientRect().top - source.getBoundingClientRect().top;
+        alignBlockToViewport(target, peer, sourceViewportOffset);
         requestAnimationFrame(() => {
           syncScrollBetween.locked = false;
         });
@@ -2214,7 +2233,8 @@
             });
 
             block.addEventListener("click", () => {
-              scrollPairToIndex(block.dataset.blockIndex);
+              const viewportOffset = block.getBoundingClientRect().top - container.getBoundingClientRect().top;
+              scrollPairToIndex(block.dataset.blockIndex, viewportOffset);
             });
 
             block.addEventListener("mouseleave", () => {
