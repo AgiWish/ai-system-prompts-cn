@@ -1851,7 +1851,7 @@
       }
 
       function stripTranslationPreface(source) {
-        const normalized = source.replace(/\r\n?/g, "\n");
+        const normalized = source.replace(/\r\n?/g, "\n").replace(/[\u2028\u2029]/g, "\n");
         const lines = normalized.split("\n");
         if (!/^#\s+.*(?:中文翻译|翻译整理|译文)/.test(lines[0] || "")) {
           return source;
@@ -1872,7 +1872,7 @@
       }
 
       function renderMarkdown(source) {
-        const lines = source.replace(/\r\n?/g, "\n").split("\n");
+        const lines = source.replace(/\r\n?/g, "\n").replace(/[\u2028\u2029]/g, "\n").split("\n");
         const html = [];
         let i = 0;
         let blockIndex = 0;
