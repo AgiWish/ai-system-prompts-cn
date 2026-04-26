@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Product Manager Prompt Library</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23241b16'/%3E%3Cpath d='M14 45V18h16c7 0 12 4 12 10s-5 10-12 10h-7v7h-9Zm9-15h7c2 0 4-1 4-3s-2-3-4-3h-7v6Z' fill='%23f7efe2'/%3E%3Cpath d='M42 45c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9Zm0-6c2 0 3-1 3-3s-1-3-3-3-3 1-3 3 1 3 3 3Z' fill='%23c7a148'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #ece6da;
+        --bg-deep: #e0d6c6;
+        --panel: rgba(253, 249, 242, 0.8);
+        --panel-strong: rgba(255, 252, 247, 0.92);
+        --text: #241b16;
+        --muted: #6b6157;
+        --line: rgba(65, 47, 31, 0.12);
+        --line-strong: rgba(65, 47, 31, 0.24);
+        --accent: #a94f2d;
+        --accent-soft: rgba(169, 79, 45, 0.12);
+        --accent-2: #1e635a;
+        --accent-2-soft: rgba(30, 99, 90, 0.1);
+        --accent-3: #c7a148;
+        --good: #2f7d5b;
+        --warn: #8f6732;
+        --shadow: 0 26px 60px rgba(45, 31, 18, 0.14);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --sidebar-width: 240px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Source Han Serif SC", "Iowan Old Style", "Songti SC", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 100% 0%, rgba(169, 79, 45, 0.1), transparent 26%),
+          linear-gradient(135deg, #f1ece3 0%, #ebe3d7 100%);
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 52px,
+            rgba(60, 45, 28, 0.022) 52px,
+            rgba(60, 45, 28, 0.022) 53px
+          );
+        mix-blend-mode: multiply;
+        opacity: 0.55;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+        height: 100vh;
+        position: relative;
+      }
+
+      body.catalog-collapsed .app {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      body.catalog-collapsed .sidebar,
+      body.toolbar-collapsed .inspector {
+        display: none;
+      }
+
+      .sidebar {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--line);
+        padding: 14px 12px 12px;
+        background:
+          linear-gradient(180deg, rgba(255, 252, 247, 0.9), rgba(243, 236, 226, 0.78)),
+          rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
+
+      .sidebar::after {
+        content: "";
+        position: absolute;
+        inset: 22px 16px 22px auto;
+        width: 1px;
+        background: linear-gradient(180deg, transparent, rgba(169, 79, 45, 0.34), transparent);
+      }
+
+      .brand {
+        padding: 0 6px 10px;
+        animation: rise 0.7s ease both;
+      }
+
+      .brand-kicker,
+      .label,
+      .control-label,
+      .pane-label,
+      .inspector-kicker,
+      .method-kicker {
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 11px;
+      }
+
+      .brand-kicker,
+      .inspector-kicker {
+        color: var(--accent);
+      }
+
+      .brand-title {
+        margin: 6px 0 7px;
+        font-family: "Didot", "Bodoni 72", "STSong", serif;
+        font-size: clamp(24px, 2.2vw, 30px);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .nav-back {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 12px;
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 12px;
+        gap: 4px;
+        transition: transform 160ms ease;
+      }
+
+      .nav-back:hover {
+        transform: translateX(-4px);
+      }
+
+      .search-panel,
+      .meta-panel {
+        margin: 0 2px 8px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 251, 244, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+      }
+
+      .label {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 7px;
+      }
+
+      .search-input {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.78);
+        color: var(--text);
+        padding: 9px 11px;
+        border-radius: 12px;
+        outline: none;
+        font: inherit;
+        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      }
+
+      .search-input:focus {
+        border-color: rgba(169, 79, 45, 0.34);
+        box-shadow: 0 0 0 4px rgba(169, 79, 45, 0.08);
+        transform: translateY(-1px);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .stat-card {
+        border-radius: 12px;
+        padding: 8px 6px;
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(53, 43, 33, 0.08);
+      }
+
+      .stat-card strong {
+        display: block;
+        font-size: 17px;
+        font-family: "Didot", "Bodoni 72", serif;
+      }
+
+      .stat-card span {
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      .phase-list {
+        flex: 1;
+        overflow: auto;
+        padding: 2px 2px 16px;
+        scrollbar-width: thin;
+      }
+
+      .phase {
+        margin-bottom: 7px;
+      }
+
+      .phase-header {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(247, 239, 228, 0.84));
+        padding: 10px 11px;
+        border-radius: 15px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .phase-header:hover {
+        transform: translateX(3px);
+        border-color: rgba(169, 79, 45, 0.28);
+        box-shadow: 0 10px 24px rgba(169, 79, 45, 0.08);
+      }
+
+      .phase.active .phase-header {
+        border-color: rgba(169, 79, 45, 0.34);
+        box-shadow: 0 12px 28px rgba(169, 79, 45, 0.12);
+      }
+
+      .phase-mark {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        border: 1px solid color-mix(in srgb, var(--mark) 28%, transparent);
+        background:
+          radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.72), transparent 42%),
+          color-mix(in srgb, var(--mark) 18%, rgba(255, 255, 255, 0.7));
+        color: color-mix(in srgb, var(--mark) 78%, #241b16);
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+        flex: none;
+      }
+
+      .phase-name {
+        font-family: "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .phase-sub {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 1px;
+      }
+
+      .phase-arrow {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(169, 79, 45, 0.08);
+        color: var(--accent);
+        transition: transform 180ms ease;
+        font-size: 16px;
+      }
+
+      .phase.expanded .phase-arrow {
+        transform: rotate(90deg);
+      }
+
+      .file-tree {
+        margin: 6px 0 0;
+        padding: 6px 4px 1px 12px;
+        border-left: 1px solid rgba(53, 43, 33, 0.12);
+      }
+
+      .file-item {
+        position: relative;
+        margin-bottom: 8px;
+      }
+
+      .file-item::before {
+        content: "";
+        position: absolute;
+        top: 19px;
+        left: -12px;
+        width: 8px;
+        border-top: 1px solid rgba(53, 43, 33, 0.12);
+      }
+
+      .file-button {
+        width: 100%;
+        text-align: left;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 8px 9px;
+        border-radius: 12px;
+        cursor: pointer;
+        color: var(--text);
+        transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+      }
+
+      .file-button:hover {
+        background: rgba(255, 255, 255, 0.58);
+        border-color: rgba(53, 43, 33, 0.08);
+        transform: translateX(2px);
+      }
+
+      .file-button.active {
+        background: linear-gradient(135deg, rgba(169, 79, 45, 0.14), rgba(199, 161, 72, 0.16));
+        border-color: rgba(169, 79, 45, 0.24);
+      }
+
+      .file-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .file-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--accent-2);
+        flex: none;
+      }
+
+      .pill {
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      /* Phase Colors */
+      .pill.p0 { color: #6b6157; border-color: rgba(107, 97, 87, 0.18); background: rgba(107, 97, 87, 0.08); }
+      .pill.p1 { color: #1e635a; border-color: rgba(30, 99, 90, 0.18); background: rgba(30, 99, 90, 0.08); }
+      .pill.p2 { color: #356fba; border-color: rgba(53, 111, 186, 0.18); background: rgba(53, 111, 186, 0.08); }
+      .pill.p3 { color: #8f6732; border-color: rgba(143, 103, 50, 0.18); background: rgba(143, 103, 50, 0.08); }
+      .pill.p4 { color: #8b5d9c; border-color: rgba(139, 93, 156, 0.18); background: rgba(139, 93, 156, 0.08); }
+      .pill.p5 { color: #2f7d5b; border-color: rgba(47, 125, 91, 0.18); background: rgba(47, 125, 91, 0.08); }
+      .pill.p6 { color: #d86b2f; border-color: rgba(216, 107, 47, 0.18); background: rgba(216, 107, 47, 0.08); }
+      .pill.p7 { color: #a94f2d; border-color: rgba(169, 79, 45, 0.18); background: rgba(169, 79, 45, 0.08); }
+
+      .main {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 8px;
+        padding: 8px;
+        overflow: hidden;
+      }
+
+      .inspector {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 252, 247, 0.78);
+        box-shadow: 0 14px 34px rgba(45, 31, 18, 0.08);
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        overflow: visible;
+        backdrop-filter: blur(16px);
+      }
+
+      .inspector-main {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        gap: 10px;
+      }
+
+      .selection-block {
+        min-width: 0;
+      }
+
+      .selection-title {
+        margin: 0;
+        font-family: "Avenir Next Condensed", "PingFang SC", sans-serif;
+        font-size: clamp(17px, 1.45vw, 22px);
+        line-height: 1.05;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .selection-path {
+        display: block;
+        margin: 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .chrome-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .inspector-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .tool-btn {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.64);
+        border-radius: 999px;
+        min-height: 30px;
+        padding: 0 11px;
+        cursor: pointer;
+        font: inherit;
+        color: var(--text);
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+
+      .tool-btn:hover {
+        border-color: rgba(169, 79, 45, 0.3);
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .tool-btn.is-active {
+        border-color: rgba(30, 99, 90, 0.3);
+        background: rgba(30, 99, 90, 0.1);
+        color: var(--accent-2);
+      }
+
+      .workspace {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: minmax(0, 1fr);
+        gap: 6px;
+      }
+
+      .panes {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .panes.layout-split {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .panes.layout-zh-focus {
+        grid-template-columns: minmax(0, 1.28fr) minmax(280px, 0.86fr);
+      }
+
+      .panes.layout-en-focus {
+        grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.28fr);
+      }
+
+      .pane {
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 253, 248, 0.84);
+        overflow: hidden;
+        box-shadow: 0 18px 44px rgba(45, 31, 18, 0.1);
+      }
+
+      .pane-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 252, 247, 0.72);
+        backdrop-filter: blur(12px);
+      }
+
+      .pane-label {
+        color: var(--muted);
+      }
+
+      .pane-file {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--text);
+        word-break: break-all;
+      }
+
+      .pane-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .pane-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(53, 43, 33, 0.18);
+      }
+
+      .pane-status.is-loaded::before {
+        background: var(--good);
+      }
+
+      .pane-status.is-loading::before {
+        background: var(--accent-3);
+      }
+
+      .pane-status.is-error::before {
+        background: var(--accent);
+      }
+
+      .pane-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 22px 24px 34px;
+        overflow: auto;
+        overscroll-behavior: contain;
+      }
+
+      .empty-state {
+        display: grid;
+        place-items: center;
+        min-height: 220px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 8px;
+        font-family: "Didot", "Bodoni 72", serif;
+        font-size: 28px;
+        color: var(--text);
+      }
+
+      .markdown {
+        font-size: 15px;
+        line-height: 1.82;
+        color: #2f261f;
+      }
+
+      .doc-block {
+        margin: 0 0 12px;
+        padding: 14px 14px 2px;
+        border: 1px solid transparent;
+        border-radius: 18px;
+        transition: background 140ms ease, border-color 140ms ease;
+      }
+
+      .doc-block:hover {
+        background: rgba(255, 255, 255, 0.48);
+      }
+
+      .doc-block.is-linked {
+        background: linear-gradient(135deg, rgba(169, 79, 45, 0.08), rgba(30, 99, 90, 0.08));
+        border-color: rgba(169, 79, 45, 0.18);
+      }
+
+      .doc-block.is-active-anchor {
+        border-color: rgba(30, 99, 90, 0.24);
+        box-shadow: 0 0 0 3px rgba(30, 99, 90, 0.08);
+      }
+
+      .markdown h1, .markdown h2, .markdown h3 {
+        margin: 1.4em 0 0.52em;
+        line-height: 1.12;
+        font-family: "Didot", "Bodoni 72", "Songti SC", serif;
+      }
+
+      .markdown h2 {
+        border-bottom: 1px solid rgba(53, 43, 33, 0.12);
+        padding-bottom: 0.28em;
+      }
+
+      .markdown p, .markdown ul, .markdown ol, .markdown blockquote, .markdown pre {
+        margin: 0 0 1.05em;
+      }
+
+      .markdown code {
+        font-family: "SFMono-Regular", "Menlo", monospace;
+        font-size: 0.92em;
+        padding: 0.14em 0.36em;
+        border-radius: 8px;
+        background: var(--accent-2-soft);
+      }
+
+      .markdown pre {
+        overflow: auto;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(33, 30, 26, 0.94);
+        color: #f7f2e8;
+      }
+
+      .markdown blockquote {
+        padding: 14px 18px;
+        border-left: 4px solid rgba(169, 79, 45, 0.36);
+        background: rgba(169, 79, 45, 0.06);
+        border-radius: 0 16px 16px 0;
+      }
+
+      .floating-chrome {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        display: none;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 252, 247, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      body.catalog-collapsed .floating-chrome {
+        display: flex;
+      }
+
+      @keyframes rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @media (max-width: 1080px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar {
+          position: fixed;
+          z-index: 30;
+          inset: 0 auto 0 0;
+          width: min(86vw, 360px);
+          transform: translateX(-100%);
+          transition: transform 220ms ease;
+          box-shadow: 24px 0 70px rgba(41, 28, 16, 0.2);
+        }
+        body.nav-open .sidebar { transform: translateX(0); }
+        .panes { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <a href="index.html" class="nav-back">← System Prompts Atlas</a>
+        <div class="brand">
+          <div class="brand-kicker">Specialized Library</div>
+          <h1 class="brand-title">AI Product Manager</h1>
+          <p class="brand-note" style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+            面向大厂标准的 AI PM 提示词全流程体系文档（P0 - P7）。
+          </p>
+        </div>
+
+        <section class="search-panel">
+          <label class="label" for="searchInput">Search Document</label>
+          <input id="searchInput" class="search-input" type="search" placeholder="搜索文档名称" autocomplete="off" />
+        </section>
+
+        <section class="meta-panel">
+          <span class="label">Library Stats</span>
+          <div class="stats">
+            <div class="stat-card">
+              <strong id="statPhases">8</strong>
+              <span>Phases</span>
+            </div>
+            <div class="stat-card">
+              <strong id="statFiles">45</strong>
+              <span>Documents</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="phase-list" id="phaseList"></div>
+      </aside>
+
+      <main class="main">
+        <section class="inspector">
+          <div class="inspector-main">
+            <div class="selection-block">
+              <div class="inspector-kicker">Dual-Pane Reader</div>
+              <h2 class="selection-title" id="selectedTitle">Select a document to begin</h2>
+              <code class="selection-path" id="selectedPath">AIPM workflow prompts from P0 to P7</code>
+            </div>
+            <div class="chrome-actions">
+              <button class="tool-btn" id="toggleCatalogBtn" type="button">目录</button>
+            </div>
+          </div>
+
+          <div class="inspector-controls">
+            <div class="button-row" style="display: flex; gap: 6px;">
+              <button class="tool-btn is-active" id="viewBothBtn" type="button">双栏</button>
+              <button class="tool-btn" id="viewZhBtn" type="button">中文</button>
+              <button class="tool-btn" id="viewEnBtn" type="button">英文</button>
+            </div>
+            <div class="button-row" style="display: flex; gap: 6px;">
+              <button class="tool-btn is-active" id="layoutSplitBtn" type="button">均分</button>
+              <button class="tool-btn" id="layoutZhFocusBtn" type="button">中宽</button>
+              <button class="tool-btn" id="layoutEnFocusBtn" type="button">英宽</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace">
+          <section class="panes layout-split" id="panes">
+            <article class="pane" id="zhPane">
+              <header class="pane-head">
+                <div>
+                  <div class="pane-label">Chinese Version</div>
+                  <div class="pane-file" id="zhFileName">未选择文件</div>
+                </div>
+                <div class="pane-status" id="zhStatus">等待选择</div>
+              </header>
+              <div class="pane-body" id="zhBody">
+                <div class="empty-state">
+                  <div><strong>选择一个文档</strong>从左侧 P0 - P7 阶段中挑选一个开始。</div>
+                </div>
+              </div>
+            </article>
+
+            <article class="pane" id="enPane">
+              <header class="pane-head">
+                <div>
+                  <div class="pane-label">English Version</div>
+                  <div class="pane-file" id="enFileName">未选择文件</div>
+                </div>
+                <div class="pane-status" id="enStatus">等待选择</div>
+              </header>
+              <div class="pane-body" id="enBody">
+                <div class="empty-state">
+                  <div><strong>English Reference</strong>英文版将作为对照参考。</div>
+                </div>
+              </div>
+            </article>
+          </section>
+        </section>
+      </main>
+
+      <div class="floating-chrome">
+        <button class="tool-btn" id="floatCatalogBtn" type="button">目录</button>
+      </div>
+    </div>
+
+    <script>
+      const AIPM_MANIFEST = [
+        { phase: "P0", phaseName: "Project Management", files: [
+          { id: "01", name: "OKR Document", chinese: "AIPM/01_P0_OKR目标文档.md", english: "AIPM/en/01_P0_OKR_Document.md" },
+          { id: "02", name: "Risk Assessment", chinese: "AIPM/02_P0_项目风险评估文档.md", english: "AIPM/en/02_P0_Risk_Assessment.md" },
+          { id: "03", name: "Legal Compliance Checklist", chinese: "AIPM/03_P0_法务合规审查清单.md", english: "AIPM/en/03_P0_Legal_Compliance_Checklist.md" },
+          { id: "04", name: "Pricing Strategy", chinese: "AIPM/04_P0_定价策略文档.md", english: "AIPM/en/04_P0_Pricing_Strategy.md" }
+        ]},
+        { phase: "P1", phaseName: "Market Intelligence", files: [
+          { id: "05", name: "Market Data Report", chinese: "AIPM/05_P1_市场数据报告.md", english: "AIPM/en/05_P1_Market_Data_Report.md" },
+          { id: "06", name: "Competitive Analysis Report", chinese: "AIPM/06_P1_竞品深度体验报告.md", english: "AIPM/en/06_P1_Competitive_Analysis_Report.md" },
+          { id: "07", name: "Business Plan (BP)", chinese: "AIPM/07_P1_商业计划书_BP.md", english: "AIPM/en/07_P1_Business_Plan_BP.md" },
+          { id: "08", name: "Project Initiation Report", chinese: "AIPM/08_P1_项目立项报告.md", english: "AIPM/en/08_P1_Project_Initiation_Report.md" },
+          { id: "09", name: "SWOT Analysis Report", chinese: "AIPM/09_P1_SWOT分析报告.md", english: "AIPM/en/09_P1_SWOT_Analysis_Report.md" }
+        ]},
+        { phase: "P2", phaseName: "User Research", files: [
+          { id: "10", name: "User Research Report", chinese: "AIPM/10_P2_用户调研报告.md", english: "AIPM/en/10_P2_User_Research_Report.md" },
+          { id: "11", name: "User Persona Document", chinese: "AIPM/11_P2_用户画像文档.md", english: "AIPM/en/11_P2_User_Persona_Document.md" },
+          { id: "12", name: "Survey Design & Data Report", chinese: "AIPM/12_P2_问卷设计与数据报告.md", english: "AIPM/en/12_P2_Survey_Design_and_Data_Report.md" },
+          { id: "13", name: "User Interview & Insights Report", chinese: "AIPM/13_P2_用户访谈记录与洞察报告.md", english: "AIPM/en/13_P2_User_Interview_and_Insights_Report.md" },
+          { id: "14", name: "User Journey Map", chinese: "AIPM/14_P2_用户旅程地图.md", english: "AIPM/en/14_P2_User_Journey_Map.md" },
+          { id: "15", name: "User Needs Prioritization", chinese: "AIPM/15_P2_用户需求优先级文档.md", english: "AIPM/en/15_P2_User_Needs_Prioritization.md" }
+        ]},
+        { phase: "P3", phaseName: "Product Planning", files: [
+          { id: "16", name: "PRD - Product Requirements Document", chinese: "AIPM/16_P3_PRD产品需求文档.md", english: "AIPM/en/16_P3_PRD_Product_Requirements_Document.md" },
+          { id: "17", name: "Product Roadmap", chinese: "AIPM/17_P3_产品路线图_Roadmap.md", english: "AIPM/en/17_P3_Product_Roadmap.md" },
+          { id: "18", name: "Feature List", chinese: "AIPM/18_P3_功能清单_Feature_List.md", english: "AIPM/en/18_P3_Feature_List.md" },
+          { id: "19", name: "Information Architecture (IA)", chinese: "AIPM/19_P3_信息架构图_IA.md", english: "AIPM/en/19_P3_Information_Architecture_IA.md" },
+          { id: "20", name: "Business Flow Diagram", chinese: "AIPM/20_P3_业务流程图.md", english: "AIPM/en/20_P3_Business_Flow_Diagram.md" },
+          { id: "21", name: "Metrics Framework Document", chinese: "AIPM/21_P3_数据指标体系文档.md", english: "AIPM/en/21_P3_Metrics_Framework_Document.md" },
+          { id: "22", name: "MRD - Market Requirements Document", chinese: "AIPM/22_P3_MRD市场需求文档.md", english: "AIPM/en/22_P3_MRD_Market_Requirements_Document.md" }
+        ]},
+        { phase: "P4", phaseName: "Design & Experience", files: [
+          { id: "23", name: "Interaction Prototype Document", chinese: "AIPM/23_P4_交互原型文档.md", english: "AIPM/en/23_P4_Interaction_Prototype_Document.md" },
+          { id: "24", name: "UI Design System", chinese: "AIPM/24_P4_UI设计规范_Design_System.md", english: "AIPM/en/24_P4_UI_Design_System.md" },
+          { id: "25", name: "Design Review Checklist", chinese: "AIPM/25_P4_设计走查清单.md", english: "AIPM/en/25_P4_Design_Review_Checklist.md" },
+          { id: "26", name: "Usability Testing Report", chinese: "AIPM/26_P4_可用性测试报告.md", english: "AIPM/en/26_P4_Usability_Testing_Report.md" },
+          { id: "27", name: "Accessibility Design Spec", chinese: "AIPM/27_P4_无障碍设计规范.md", english: "AIPM/en/27_P4_Accessibility_Design_Spec.md" }
+        ]},
+        { phase: "P5", phaseName: "Technical Development", files: [
+          { id: "28", name: "Technical Architecture Document", chinese: "AIPM/28_P5_技术架构文档.md", english: "AIPM/en/28_P5_Technical_Architecture_Document.md" },
+          { id: "29", name: "Model Iteration Evaluation Report", chinese: "AIPM/29_P5_模型迭代评估报告.md", english: "AIPM/en/29_P5_Model_Iteration_Evaluation_Report.md" },
+          { id: "30", name: "API Documentation", chinese: "AIPM/30_P5_API接口文档.md", english: "AIPM/en/30_P5_API_Documentation.md" },
+          { id: "31", name: "Database Design Document", chinese: "AIPM/31_P5_数据库设计文档.md", english: "AIPM/en/31_P5_Database_Design_Document.md" },
+          { id: "32", name: "Event Tracking Requirements", chinese: "AIPM/32_P5_埋点需求文档.md", english: "AIPM/en/32_P5_Event_Tracking_Requirements.md" },
+          { id: "33", name: "Technical Design Review Report", chinese: "AIPM/33_P5_技术方案评审报告.md", english: "AIPM/en/33_P5_Technical_Design_Review_Report.md" },
+          { id: "34", name: "Performance Testing Report", chinese: "AIPM/34_P5_性能测试报告.md", english: "AIPM/en/34_P5_Performance_Testing_Report.md" },
+          { id: "35", name: "Security Assessment Report", chinese: "AIPM/35_P5_安全评估报告.md", english: "AIPM/en/35_P5_Security_Assessment_Report.md" }
+        ]},
+        { phase: "P6", phaseName: "Launch & Operations", files: [
+          { id: "36", name: "GTM Launch Plan", chinese: "AIPM/36_P6_GTM上线发布计划.md", english: "AIPM/en/36_P6_GTM_Launch_Plan.md" },
+          { id: "37", name: "Growth Strategy", chinese: "AIPM/37_P6_运营增长方案.md", english: "AIPM/en/37_P6_Growth_Strategy.md" },
+          { id: "38", name: "Data Monitoring Dashboard", chinese: "AIPM/38_P6_数据监控看板文档.md", english: "AIPM/en/38_P6_Data_Monitoring_Dashboard.md" },
+          { id: "39", name: "A/B Testing Plan", chinese: "AIPM/39_P6_A-B测试方案.md", english: "AIPM/en/39_P6_AB_Testing_Plan.md" },
+          { id: "40", name: "Product Retrospective Report", chinese: "AIPM/40_P6_产品复盘报告.md", english: "AIPM/en/40_P6_Product_Retrospective_Report.md" }
+        ]},
+        { phase: "P7", phaseName: "AI Specialization", files: [
+          { id: "41", name: "Prompt Engineering Spec", chinese: "AIPM/41_P7_Prompt工程规范文档.md", english: "AIPM/en/41_P7_Prompt_Engineering_Spec.md" },
+          { id: "42", name: "Model Card", chinese: "AIPM/42_P7_模型卡片_Model_Card.md", english: "AIPM/en/42_P7_Model_Card.md" },
+          { id: "43", name: "AI Ethics & Compliance", chinese: "AIPM/43_P7_AI伦理与合规文档.md", english: "AIPM/en/43_P7_AI_Ethics_and_Compliance.md" },
+          { id: "44", name: "AI Safety Redlines", chinese: "AIPM/44_P7_AI安全红线文档.md", english: "AIPM/en/44_P7_AI安全红线文档.md" },
+          { id: "45", name: "Data Governance Document", chinese: "AIPM/45_P7_数据治理文档.md", english: "AIPM/en/45_P7_Data_Governance_Document.md" }
+        ]}
+      ];
+
+      const state = {
+        search: "",
+        expandedPhases: new Set(),
+        selected: null,
+        viewMode: "both",
+        layoutMode: "split",
+        cache: new Map()
+      };
+
+      const phaseList = document.getElementById("phaseList");
+      const searchInput = document.getElementById("searchInput");
+      const selectedTitle = document.getElementById("selectedTitle");
+      const selectedPath = document.getElementById("selectedPath");
+      const zhFileName = document.getElementById("zhFileName");
+      const zhStatus = document.getElementById("zhStatus");
+      const zhBody = document.getElementById("zhBody");
+      const enFileName = document.getElementById("enFileName");
+      const enStatus = document.getElementById("enStatus");
+      const enBody = document.getElementById("enBody");
+      const zhPane = document.getElementById("zhPane");
+      const enPane = document.getElementById("enPane");
+      const panes = document.getElementById("panes");
+
+      const viewBothBtn = document.getElementById("viewBothBtn");
+      const viewZhBtn = document.getElementById("viewZhBtn");
+      const viewEnBtn = document.getElementById("viewEnBtn");
+      const layoutSplitBtn = document.getElementById("layoutSplitBtn");
+      const layoutZhFocusBtn = document.getElementById("layoutZhFocusBtn");
+      const layoutEnFocusBtn = document.getElementById("layoutEnFocusBtn");
+      const toggleCatalogBtn = document.getElementById("toggleCatalogBtn");
+      const floatCatalogBtn = document.getElementById("floatCatalogBtn");
+
+      function encodePath(path) {
+        return path.split("/").map(s => encodeURIComponent(s)).join("/");
+      }
+
+      function escapeHtml(v) {
+        return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+
+      function parseInline(text) {
+        let html = escapeHtml(text);
+        html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+        html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+        return html;
+      }
+
+      function renderMarkdown(source) {
+        const lines = source.split(/\r?\n/);
+        const html = [];
+        let i = 0;
+        let blockIndex = 0;
+
+        while (i < lines.length) {
+          const line = lines[i];
+          if (!line.trim()) { i++; continue; }
+
+          if (line.startsWith("```")) {
+            const block = []; i++;
+            while (i < lines.length && !lines[i].startsWith("```")) { block.push(lines[i]); i++; }
+            if (i < lines.length) i++;
+            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><pre><code>${escapeHtml(block.join("\n"))}</code></pre></section>`);
+            continue;
+          }
+
+          const heading = line.match(/^(#{1,6})\s+(.*)$/);
+          if (heading) {
+            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><h${heading[1].length}>${parseInline(heading[2])}</h${heading[1].length}></section>`);
+            i++; continue;
+          }
+
+          if (line.startsWith("- ") || line.startsWith("* ")) {
+            const items = [];
+            while (i < lines.length && (lines[i].startsWith("- ") || lines[i].startsWith("* "))) {
+              items.push(`<li>${parseInline(lines[i].substring(2))}</li>`);
+              i++;
+            }
+            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><ul>${items.join("")}</ul></section>`);
+            continue;
+          }
+
+          const paragraph = [];
+          while (i < lines.length && lines[i].trim() && !lines[i].startsWith("#") && !lines[i].startsWith("```") && !lines[i].startsWith("- ") && !lines[i].startsWith("* ")) {
+            paragraph.push(lines[i].trim());
+            i++;
+          }
+          html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><p>${paragraph.map(p => parseInline(p)).join("<br>")}</p></section>`);
+        }
+        return `<div class="markdown">${html.join("")}</div>`;
+      }
+
+      async function loadFile(relPath) {
+        if (!relPath) return null;
+        if (state.cache.has(relPath)) return state.cache.get(relPath);
+        const response = await fetch(encodePath(relPath));
+        if (!response.ok) throw new Error("404");
+        const text = await response.text();
+        state.cache.set(relPath, text);
+        return text;
+      }
+
+      function renderSidebar() {
+        const search = state.search.toLowerCase();
+        phaseList.innerHTML = AIPM_MANIFEST.map(p => {
+          const filteredFiles = p.files.filter(f => f.name.toLowerCase().includes(search) || f.chinese.toLowerCase().includes(search));
+          if (search && filteredFiles.length === 0) return "";
+          const isExpanded = search ? true : state.expandedPhases.has(p.phase);
+          const phaseCode = p.phase.toLowerCase();
+          return `
+            <section class="phase ${isExpanded ? "expanded" : ""}">
+              <button class="phase-header" onclick="togglePhase('${p.phase}')">
+                <span class="phase-mark p-mark-${phaseCode}" style="--mark: var(--accent${p.phase === "P0" ? "" : p.phase === "P3" ? "-3" : "-2"})">${p.phase}</span>
+                <span style="min-width: 0;">
+                  <div class="phase-name">${p.phaseName}</div>
+                  <div class="phase-sub">${filteredFiles.length} files</div>
+                </span>
+                <span class="phase-arrow">›</span>
+              </button>
+              ${isExpanded ? `
+                <div class="file-tree">
+                  ${filteredFiles.map(f => `
+                    <div class="file-item">
+                      <button class="file-button ${state.selected?.id === f.id ? "active" : ""}" onclick="selectFile('${f.id}')">
+                        <div class="file-title"><span class="file-dot"></span><span>${f.name}</span></div>
+                        <div style="margin-top:4px;"><span class="pill ${phaseCode}">${p.phase}</span></div>
+                      </button>
+                    </div>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </section>
+          `;
+        }).join("");
+      }
+
+      window.togglePhase = (phase) => {
+        if (state.expandedPhases.has(phase)) state.expandedPhases.delete(phase);
+        else state.expandedPhases.add(phase);
+        renderSidebar();
+      };
+
+      window.selectFile = (id) => {
+        let file = null;
+        AIPM_MANIFEST.forEach(p => p.files.forEach(f => { if (f.id === id) file = f; }));
+        if (!file) return;
+        state.selected = file;
+        renderSidebar();
+        renderSelection();
+        if (window.innerWidth <= 1080) document.body.classList.remove("nav-open");
+      };
+
+      async function renderSelection() {
+        const { chinese, english, name } = state.selected;
+        selectedTitle.textContent = name;
+        selectedPath.textContent = chinese;
+        zhFileName.textContent = chinese;
+        enFileName.textContent = english;
+
+        zhStatus.textContent = "Loading"; zhStatus.className = "pane-status is-loading";
+        enStatus.textContent = "Loading"; enStatus.className = "pane-status is-loading";
+
+        try {
+          const zhText = await loadFile(chinese);
+          zhBody.innerHTML = renderMarkdown(zhText);
+          zhStatus.textContent = "Loaded"; zhStatus.className = "pane-status is-loaded";
+        } catch (e) {
+          zhBody.innerHTML = `<div class="empty-state">Error loading file.</div>`;
+          zhStatus.textContent = "Error"; zhStatus.className = "pane-status is-error";
+        }
+
+        try {
+          const enText = await loadFile(english);
+          enBody.innerHTML = renderMarkdown(enText);
+          enStatus.textContent = "Loaded"; enStatus.className = "pane-status is-loaded";
+        } catch (e) {
+          enBody.innerHTML = `<div class="empty-state"><div><strong>English version coming soon</strong>英文版即将上线 · 翻译整理中</div></div>`;
+          enStatus.textContent = "Unavailable"; enStatus.className = "pane-status";
+        }
+        zhBody.scrollTop = enBody.scrollTop = 0;
+      }
+
+      function syncUI() {
+        viewBothBtn.classList.toggle("is-active", state.viewMode === "both");
+        viewZhBtn.classList.toggle("is-active", state.viewMode === "zh");
+        viewEnBtn.classList.toggle("is-active", state.viewMode === "en");
+        zhPane.hidden = state.viewMode === "en";
+        enPane.hidden = state.viewMode === "zh";
+
+        layoutSplitBtn.classList.toggle("is-active", state.layoutMode === "split");
+        layoutZhFocusBtn.classList.toggle("is-active", state.layoutMode === "zh-focus");
+        layoutEnFocusBtn.classList.toggle("is-active", state.layoutMode === "en-focus");
+        panes.className = `panes layout-${state.layoutMode}`;
+      }
+
+      searchInput.addEventListener("input", e => { state.search = e.target.value; renderSidebar(); });
+      viewBothBtn.onclick = () => { state.viewMode = "both"; syncUI(); };
+      viewZhBtn.onclick = () => { state.viewMode = "zh"; syncUI(); };
+      viewEnBtn.onclick = () => { state.viewMode = "en"; syncUI(); };
+      layoutSplitBtn.onclick = () => { state.layoutMode = "split"; syncUI(); };
+      layoutZhFocusBtn.onclick = () => { state.layoutMode = "zh-focus"; syncUI(); };
+      layoutEnFocusBtn.onclick = () => { state.layoutMode = "en-focus"; syncUI(); };
+      toggleCatalogBtn.onclick = floatCatalogBtn.onclick = () => document.body.classList.toggle("catalog-collapsed");
+
+      state.expandedPhases.add("P3");
+      selectFile("16");
+      syncUI();
+    </script>
+  </body>
+</html>
