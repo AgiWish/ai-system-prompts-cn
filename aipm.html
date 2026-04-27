@@ -346,6 +346,15 @@
         gap: 8px;
         font-size: 13px;
         line-height: 1.45;
+        min-width: 0;
+      }
+
+      .file-title span:not(.file-dot) {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .file-dot {
