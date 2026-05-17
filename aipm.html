@@ -11,8 +11,8 @@
     />
     <style>
       :root {
-        --bg: #ece6da;
-        --bg-deep: #e0d6c6;
+        --bg: #f7f3ea;
+        --bg-deep: #eee4d6;
         --panel: rgba(253, 249, 242, 0.8);
         --panel-strong: rgba(255, 252, 247, 0.92);
         --text: #241b16;
@@ -31,6 +31,10 @@
         --radius-lg: 22px;
         --radius-md: 16px;
         --sidebar-width: 240px;
+        --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+        --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+        --spot-x: 80%;
+        --spot-y: 12%;
       }
 
       * {
@@ -43,12 +47,16 @@
         min-height: 100%;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         font-family: "Source Han Serif SC", "Iowan Old Style", "Songti SC", serif;
         color: var(--text);
         background:
           radial-gradient(circle at 100% 0%, rgba(169, 79, 45, 0.1), transparent 26%),
-          linear-gradient(135deg, #f1ece3 0%, #ebe3d7 100%);
+          linear-gradient(135deg, #f8f3ea 0%, #eee4d6 100%);
         overflow: hidden;
       }
 
@@ -70,11 +78,53 @@
         opacity: 0.55;
       }
 
+      body::after {
+        content: "";
+        position: fixed;
+        inset: -18vh -18vw;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(199, 161, 72, 0.18), transparent 22rem),
+          radial-gradient(circle at calc(var(--spot-x) - 24%) calc(var(--spot-y) + 16%), rgba(30, 99, 90, 0.10), transparent 18rem);
+        opacity: 0.78;
+      }
+
+      a:not(.tool-btn) {
+        color: var(--accent);
+        text-decoration: none;
+        background-image: linear-gradient(90deg, currentColor, currentColor);
+        background-position: 0 100%;
+        background-repeat: no-repeat;
+        background-size: 0 1px;
+        transition: color 180ms var(--ease-out-quart), background-size 260ms var(--ease-out-quart);
+      }
+
+      a:not(.tool-btn):hover {
+        color: var(--accent-2);
+        background-size: 100% 1px;
+      }
+
       .app {
         display: grid;
         grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
         height: 100vh;
         position: relative;
+        z-index: 1;
+      }
+
+      .motion-item {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0);
+        transition:
+          opacity 520ms var(--ease-out-quart),
+          transform 520ms var(--ease-out-quart);
+        transition-delay: var(--motion-delay, 0ms);
+      }
+
+      .motion-item.is-visible {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
       }
 
       body.catalog-collapsed .app {
@@ -134,7 +184,7 @@
         font-family: "Didot", "Bodoni 72", "STSong", serif;
         font-size: clamp(24px, 2.2vw, 30px);
         line-height: 0.95;
-        letter-spacing: -0.04em;
+        letter-spacing: 0;
       }
 
       .nav-back {
@@ -197,6 +247,15 @@
         padding: 8px 6px;
         background: rgba(255, 255, 255, 0.68);
         border: 1px solid rgba(53, 43, 33, 0.08);
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
+      }
+
+      .stat-card:hover,
+      .outline-track:hover {
+        transform: perspective(900px) rotateX(1.1deg) rotateY(-1.2deg) translateY(-2px);
+        border-color: rgba(169, 79, 45, 0.22);
+        box-shadow: 0 18px 42px rgba(45, 31, 18, 0.12);
       }
 
       .stat-card strong {
@@ -380,11 +439,11 @@
       /* Phase Colors */
       .pill.p0 { color: #6b6157; border-color: rgba(107, 97, 87, 0.18); background: rgba(107, 97, 87, 0.08); }
       .pill.p1 { color: #1e635a; border-color: rgba(30, 99, 90, 0.18); background: rgba(30, 99, 90, 0.08); }
-      .pill.p2 { color: #356fba; border-color: rgba(53, 111, 186, 0.18); background: rgba(53, 111, 186, 0.08); }
+      .pill.p2 { color: #365f8c; border-color: rgba(54, 95, 140, 0.18); background: rgba(54, 95, 140, 0.08); }
       .pill.p3 { color: #8f6732; border-color: rgba(143, 103, 50, 0.18); background: rgba(143, 103, 50, 0.08); }
-      .pill.p4 { color: #8b5d9c; border-color: rgba(139, 93, 156, 0.18); background: rgba(139, 93, 156, 0.08); }
+      .pill.p4 { color: #a94f2d; border-color: rgba(169, 79, 45, 0.18); background: rgba(169, 79, 45, 0.08); }
       .pill.p5 { color: #2f7d5b; border-color: rgba(47, 125, 91, 0.18); background: rgba(47, 125, 91, 0.08); }
-      .pill.p6 { color: #d86b2f; border-color: rgba(216, 107, 47, 0.18); background: rgba(216, 107, 47, 0.08); }
+      .pill.p6 { color: #c7a148; border-color: rgba(199, 161, 72, 0.22); background: rgba(199, 161, 72, 0.1); }
       .pill.p7 { color: #a94f2d; border-color: rgba(169, 79, 45, 0.18); background: rgba(169, 79, 45, 0.08); }
 
       .main {
@@ -464,12 +523,18 @@
         cursor: pointer;
         font: inherit;
         color: var(--text);
-        transition: border-color 160ms ease, background 160ms ease;
+        transition: transform 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), background 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
       }
 
       .tool-btn:hover {
+        transform: scale(1.025);
         border-color: rgba(169, 79, 45, 0.3);
         background: rgba(255, 255, 255, 0.92);
+        box-shadow: inset 0 0 18px rgba(199, 161, 72, 0.14), 0 10px 22px rgba(45, 31, 18, 0.10);
+      }
+
+      .tool-btn:active {
+        transform: scale(0.985);
       }
 
       .tool-btn.is-active {
@@ -481,8 +546,83 @@
       .workspace {
         min-height: 0;
         display: grid;
-        grid-template-rows: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
         gap: 6px;
+      }
+
+      .outline-rail {
+        display: grid;
+        grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+        gap: 8px;
+        align-items: stretch;
+      }
+
+      .outline-intro,
+      .outline-track {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 252, 247, 0.68);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+      }
+
+      .outline-intro {
+        padding: 8px 10px;
+      }
+
+      .outline-intro strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 13px;
+      }
+
+      .outline-intro p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      .outline-track {
+        min-width: 0;
+        padding: 7px;
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
+      }
+
+      .outline-list {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        scrollbar-width: thin;
+      }
+
+      .outline-chip {
+        flex: 0 0 auto;
+        min-height: 30px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.66);
+        color: var(--muted);
+        cursor: pointer;
+        font: inherit;
+        font-size: 11px;
+        line-height: 1.2;
+        transition: transform 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), background 180ms var(--ease-out-quart), color 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
+      }
+
+      .outline-chip:hover {
+        transform: translateY(-1px) scale(1.02);
+        border-color: rgba(169, 79, 45, 0.28);
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--text);
+        box-shadow: inset 0 0 16px rgba(199, 161, 72, 0.12), 0 8px 18px rgba(45, 31, 18, 0.08);
+      }
+
+      .outline-chip.is-active {
+        border-color: rgba(30, 99, 90, 0.28);
+        background: rgba(30, 99, 90, 0.1);
+        color: var(--accent-2);
       }
 
       .panes {
@@ -571,6 +711,8 @@
         padding: 22px 24px 34px;
         overflow: auto;
         overscroll-behavior: contain;
+        overflow-anchor: none;
+        scroll-behavior: smooth;
       }
 
       .empty-state {
@@ -600,10 +742,16 @@
         padding: 14px 14px 2px;
         border: 1px solid transparent;
         border-radius: 18px;
-        transition: background 140ms ease, border-color 140ms ease;
+        transition:
+          transform 180ms var(--ease-out-quart),
+          background 180ms var(--ease-out-quart),
+          border-color 180ms var(--ease-out-quart),
+          box-shadow 180ms var(--ease-out-quart);
+        will-change: transform;
       }
 
       .doc-block:hover {
+        transform: translateY(-1px);
         background: rgba(255, 255, 255, 0.48);
       }
 
@@ -650,9 +798,9 @@
 
       .markdown blockquote {
         padding: 14px 18px;
-        border-left: 4px solid rgba(169, 79, 45, 0.36);
+        border: 1px solid rgba(169, 79, 45, 0.22);
         background: rgba(169, 79, 45, 0.06);
-        border-radius: 0 16px 16px 0;
+        border-radius: 16px;
       }
 
       .floating-chrome {
@@ -678,6 +826,30 @@
         to { opacity: 1; transform: translateY(0); }
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 1ms !important;
+          scroll-behavior: auto !important;
+        }
+
+        .motion-item {
+          opacity: 1;
+          transform: none;
+        }
+
+        body::after {
+          opacity: 0.42;
+        }
+      }
+
       @media (max-width: 1080px) {
         .app { grid-template-columns: 1fr; }
         .sidebar {
@@ -690,6 +862,16 @@
           box-shadow: 24px 0 70px rgba(41, 28, 16, 0.2);
         }
         body.nav-open .sidebar { transform: translateX(0); }
+        .inspector {
+          grid-template-columns: 1fr;
+        }
+        .inspector-controls {
+          justify-content: flex-start;
+          flex-wrap: wrap;
+        }
+        .outline-rail {
+          grid-template-columns: 1fr;
+        }
         .panes { grid-template-columns: 1fr; }
       }
     </style>
@@ -752,10 +934,25 @@
               <button class="tool-btn" id="layoutZhFocusBtn" type="button">中宽</button>
               <button class="tool-btn" id="layoutEnFocusBtn" type="button">英宽</button>
             </div>
+            <div class="button-row" style="display: flex; gap: 6px;">
+              <button class="tool-btn is-active" id="syncScrollBtn" type="button">同步</button>
+            </div>
           </div>
         </section>
 
         <section class="workspace">
+          <section class="outline-rail" id="outlineRail">
+            <div class="outline-intro">
+              <div class="inspector-kicker">Outline</div>
+              <strong id="outlineTitle">章节导航</strong>
+              <p id="outlineMeta">选择文档后生成区块导航。</p>
+            </div>
+            <div class="outline-track">
+              <div class="outline-list" id="outlineList">
+                <button class="outline-chip is-active" type="button">等待选择</button>
+              </div>
+            </div>
+          </section>
           <section class="panes layout-split" id="panes">
             <article class="pane" id="zhPane">
               <header class="pane-head">
@@ -855,7 +1052,7 @@
           { id: "41", name: "Prompt Engineering Spec", chinese: "AIPM/41_P7_Prompt工程规范文档.md", english: "AIPM/en/41_P7_Prompt_Engineering_Spec.md" },
           { id: "42", name: "Model Card", chinese: "AIPM/42_P7_模型卡片_Model_Card.md", english: "AIPM/en/42_P7_Model_Card.md" },
           { id: "43", name: "AI Ethics & Compliance", chinese: "AIPM/43_P7_AI伦理与合规文档.md", english: "AIPM/en/43_P7_AI_Ethics_and_Compliance.md" },
-          { id: "44", name: "AI Safety Redlines", chinese: "AIPM/44_P7_AI安全红线文档.md", english: "AIPM/en/44_P7_AI安全红线文档.md" },
+          { id: "44", name: "AI Safety Redlines", chinese: "AIPM/44_P7_AI安全红线文档.md", english: "AIPM/en/44_P7_AI_Safety_Redlines.md" },
           { id: "45", name: "Data Governance Document", chinese: "AIPM/45_P7_数据治理文档.md", english: "AIPM/en/45_P7_Data_Governance_Document.md" }
         ]}
       ];
@@ -866,7 +1063,13 @@
         selected: null,
         viewMode: "both",
         layoutMode: "split",
-        cache: new Map()
+        syncScroll: true,
+        activeBlockIndex: "0",
+        scrollLocked: false,
+        scrollRaf: 0,
+        cache: new Map(),
+        blockCache: new Map(),
+        prefersReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches
       };
 
       const phaseList = document.getElementById("phaseList");
@@ -889,8 +1092,13 @@
       const layoutSplitBtn = document.getElementById("layoutSplitBtn");
       const layoutZhFocusBtn = document.getElementById("layoutZhFocusBtn");
       const layoutEnFocusBtn = document.getElementById("layoutEnFocusBtn");
+      const syncScrollBtn = document.getElementById("syncScrollBtn");
       const toggleCatalogBtn = document.getElementById("toggleCatalogBtn");
       const floatCatalogBtn = document.getElementById("floatCatalogBtn");
+      const outlineRail = document.getElementById("outlineRail");
+      const outlineTitle = document.getElementById("outlineTitle");
+      const outlineMeta = document.getElementById("outlineMeta");
+      const outlineList = document.getElementById("outlineList");
 
       function encodePath(path) {
         return path.split("/").map(s => encodeURIComponent(s)).join("/");
@@ -908,8 +1116,30 @@
         return html;
       }
 
+      function compactLabel(text, limit = 34) {
+        const normalized = String(text || "")
+          .replace(/<[^>]*>/g, " ")
+          .replace(/[`*_>#-]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!normalized) return "区块";
+        return normalized.length > limit ? `${normalized.slice(0, limit)}...` : normalized;
+      }
+
+      function renderDocBlock(content, kind, label, blockIndex) {
+        return `<section class="doc-block" data-block-kind="${kind}" data-block-index="${blockIndex}" data-block-label="${escapeHtml(compactLabel(label))}">${content}</section>`;
+      }
+
+      function isListLine(line) {
+        return /^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line);
+      }
+
+      function isBlockStart(line) {
+        return line.startsWith("#") || line.startsWith("```") || line.startsWith(">") || isListLine(line);
+      }
+
       function renderMarkdown(source) {
-        const lines = source.split(/\r?\n/);
+        const lines = String(source || "").split(/\r?\n/);
         const html = [];
         let i = 0;
         let blockIndex = 0;
@@ -918,36 +1148,55 @@
           const line = lines[i];
           if (!line.trim()) { i++; continue; }
 
+          if (line.trim().startsWith("<!--")) {
+            i++;
+            while (i < lines.length && !lines[i - 1].includes("-->")) i++;
+            continue;
+          }
+
           if (line.startsWith("```")) {
             const block = []; i++;
             while (i < lines.length && !lines[i].startsWith("```")) { block.push(lines[i]); i++; }
             if (i < lines.length) i++;
-            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><pre><code>${escapeHtml(block.join("\n"))}</code></pre></section>`);
+            html.push(renderDocBlock(`<pre><code>${escapeHtml(block.join("\n"))}</code></pre>`, "code", "Code Block", blockIndex++));
             continue;
           }
 
           const heading = line.match(/^(#{1,6})\s+(.*)$/);
           if (heading) {
-            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><h${heading[1].length}>${parseInline(heading[2])}</h${heading[1].length}></section>`);
+            html.push(renderDocBlock(`<h${heading[1].length}>${parseInline(heading[2])}</h${heading[1].length}>`, "heading", heading[2], blockIndex++));
             i++; continue;
           }
 
-          if (line.startsWith("- ") || line.startsWith("* ")) {
-            const items = [];
-            while (i < lines.length && (lines[i].startsWith("- ") || lines[i].startsWith("* "))) {
-              items.push(`<li>${parseInline(lines[i].substring(2))}</li>`);
+          if (line.startsWith(">")) {
+            const block = [];
+            while (i < lines.length && lines[i].startsWith(">")) {
+              block.push(lines[i].replace(/^>\s?/, ""));
               i++;
             }
-            html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><ul>${items.join("")}</ul></section>`);
+            html.push(renderDocBlock(`<blockquote>${block.map(part => `<p>${parseInline(part)}</p>`).join("")}</blockquote>`, "quote", block[0], blockIndex++));
+            continue;
+          }
+
+          if (isListLine(line)) {
+            const items = [];
+            const ordered = /^\d+\.\s+/.test(line);
+            while (i < lines.length && isListLine(lines[i])) {
+              const item = lines[i].replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "");
+              items.push(`<li>${parseInline(item)}</li>`);
+              i++;
+            }
+            const tag = ordered ? "ol" : "ul";
+            html.push(renderDocBlock(`<${tag}>${items.join("")}</${tag}>`, "list", items[0], blockIndex++));
             continue;
           }
 
           const paragraph = [];
-          while (i < lines.length && lines[i].trim() && !lines[i].startsWith("#") && !lines[i].startsWith("```") && !lines[i].startsWith("- ") && !lines[i].startsWith("* ")) {
+          while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i])) {
             paragraph.push(lines[i].trim());
             i++;
           }
-          html.push(`<section class="doc-block" data-block-index="${blockIndex++}"><p>${paragraph.map(p => parseInline(p)).join("<br>")}</p></section>`);
+          html.push(renderDocBlock(`<p>${paragraph.map(p => parseInline(p)).join("<br>")}</p>`, "paragraph", paragraph[0], blockIndex++));
         }
         return `<div class="markdown">${html.join("")}</div>`;
       }
@@ -960,6 +1209,257 @@
         const text = await response.text();
         state.cache.set(relPath, text);
         return text;
+      }
+
+      const revealObserver = "IntersectionObserver" in window
+        ? new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("is-visible");
+              revealObserver.unobserve(entry.target);
+            });
+          }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" })
+        : null;
+
+      function prepareMotion(scope = document) {
+        const items = scope.querySelectorAll(".brand, .search-panel, .meta-panel, .phase, .stat-card, .inspector, .outline-rail, .pane, .doc-block");
+        items.forEach((item, index) => {
+          if (item.dataset.motionReady) return;
+          item.dataset.motionReady = "true";
+          item.classList.add("motion-item");
+          item.style.setProperty("--motion-delay", `${Math.min(index * 34, 238)}ms`);
+          if (state.prefersReducedMotion || !revealObserver) item.classList.add("is-visible");
+          else revealObserver.observe(item);
+        });
+      }
+
+      function initAmbientSpotlight() {
+        if (state.prefersReducedMotion || state.spotlightReady) return;
+        state.spotlightReady = true;
+        let pending = false;
+        let nextX = "80%";
+        let nextY = "12%";
+        window.addEventListener("pointermove", (event) => {
+          nextX = `${((event.clientX / window.innerWidth) * 100).toFixed(2)}%`;
+          nextY = `${((event.clientY / window.innerHeight) * 100).toFixed(2)}%`;
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(() => {
+            document.documentElement.style.setProperty("--spot-x", nextX);
+            document.documentElement.style.setProperty("--spot-y", nextY);
+            pending = false;
+          });
+        }, { passive: true });
+      }
+
+      function paneEmpty(title, body = "") {
+        return `<div class="empty-state"><div><strong>${escapeHtml(title)}</strong>${escapeHtml(body)}</div></div>`;
+      }
+
+      function setPaneStatus(target, text, modifier = "") {
+        target.textContent = text;
+        target.className = `pane-status${modifier ? ` ${modifier}` : ""}`;
+      }
+
+      function paneBlocks(container) {
+        return Array.from(container.querySelectorAll(".doc-block"));
+      }
+
+      function refreshBlockCache() {
+        state.blockCache.set("zh", paneBlocks(zhBody));
+        state.blockCache.set("en", paneBlocks(enBody));
+      }
+
+      function equalizePairedBlocks() {
+        const zhBlocks = state.blockCache.get("zh") || [];
+        const enBlocks = state.blockCache.get("en") || [];
+        [...zhBlocks, ...enBlocks].forEach(block => { block.style.minHeight = ""; });
+        if (state.viewMode !== "both") return;
+        requestAnimationFrame(() => {
+          const enByIndex = new Map(enBlocks.map(block => [block.dataset.blockIndex, block]));
+          zhBlocks.forEach(zhBlock => {
+            const enBlock = enByIndex.get(zhBlock.dataset.blockIndex);
+            if (!enBlock) return;
+            const height = Math.ceil(Math.max(zhBlock.offsetHeight, enBlock.offsetHeight));
+            zhBlock.style.minHeight = `${height}px`;
+            enBlock.style.minHeight = `${height}px`;
+          });
+        });
+      }
+
+      function getBlock(lang, index) {
+        const blocks = state.blockCache.get(lang) || [];
+        return blocks.find(block => block.dataset.blockIndex === String(index));
+      }
+
+      function syncOutlineState() {
+        const chips = Array.from(outlineList.querySelectorAll(".outline-chip[data-jump-index]"));
+        const active = Number(state.activeBlockIndex);
+        let current = chips[0] || null;
+        chips.forEach(chip => {
+          if (Number(chip.dataset.jumpIndex) <= active) current = chip;
+          chip.classList.remove("is-active");
+        });
+        if (current) current.classList.add("is-active");
+      }
+
+      function setLinkedIndex(index) {
+        document.querySelectorAll(".doc-block.is-linked").forEach(block => block.classList.remove("is-linked"));
+        ["zh", "en"].forEach(lang => {
+          const block = getBlock(lang, index);
+          if (block) block.classList.add("is-linked");
+        });
+      }
+
+      function syncActiveBlocks() {
+        document.querySelectorAll(".doc-block.is-linked, .doc-block.is-active-anchor").forEach(block => {
+          block.classList.remove("is-linked", "is-active-anchor");
+        });
+        ["zh", "en"].forEach(lang => {
+          const block = getBlock(lang, state.activeBlockIndex);
+          if (block) block.classList.add("is-linked", "is-active-anchor");
+        });
+        syncOutlineState();
+      }
+
+      function clampScrollTop(container, nextTop) {
+        return Math.max(0, Math.min(nextTop, container.scrollHeight - container.clientHeight));
+      }
+
+      function blockTop(container, block) {
+        return block.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+      }
+
+      function syncAnchorOffset(container) {
+        return Math.max(28, Math.min(48, container.clientHeight * 0.06));
+      }
+
+      function blockSpan(container, blocks, block) {
+        const currentTop = blockTop(container, block);
+        const index = blocks.indexOf(block);
+        const next = blocks[index + 1];
+        const nextTop = next ? blockTop(container, next) : container.scrollHeight;
+        return Math.max(1, nextTop - currentTop);
+      }
+
+      function activeBlockForScroll(container) {
+        const lang = container === zhBody ? "zh" : "en";
+        const blocks = state.blockCache.get(lang) || [];
+        if (!blocks.length) return null;
+        const anchorTop = container.scrollTop + syncAnchorOffset(container);
+        let active = blocks[0];
+        blocks.forEach(block => {
+          if (blockTop(container, block) <= anchorTop) active = block;
+        });
+        return active;
+      }
+
+      function alignBlockToViewport(container, block, viewportOffset = syncAnchorOffset(container)) {
+        if (!block) return;
+        const top = clampScrollTop(container, blockTop(container, block) - viewportOffset);
+        container.scrollTo({ top, behavior: state.prefersReducedMotion ? "auto" : "smooth" });
+      }
+
+      function lockScroll(duration = 520) {
+        state.scrollLocked = true;
+        clearTimeout(state.scrollUnlockTimer);
+        state.scrollUnlockTimer = window.setTimeout(() => {
+          state.scrollLocked = false;
+        }, state.prefersReducedMotion ? 40 : duration);
+      }
+
+      function scrollPairToIndex(index, sourceContainer = null) {
+        state.activeBlockIndex = String(index);
+        syncActiveBlocks();
+        if (!sourceContainer) {
+          lockScroll();
+          alignBlockToViewport(zhBody, getBlock("zh", index));
+          alignBlockToViewport(enBody, getBlock("en", index));
+          return;
+        }
+        if (!state.syncScroll) return;
+        const peerBody = sourceContainer === zhBody ? enBody : zhBody;
+        const peerLang = sourceContainer === zhBody ? "en" : "zh";
+        const sourceBlock = sourceContainer.querySelector(`[data-block-index="${index}"]`);
+        const viewportOffset = sourceBlock
+          ? sourceBlock.getBoundingClientRect().top - sourceContainer.getBoundingClientRect().top
+          : syncAnchorOffset(sourceContainer);
+        lockScroll();
+        alignBlockToViewport(peerBody, getBlock(peerLang, index), viewportOffset);
+      }
+
+      function syncPeerByProgress(container) {
+        if (!state.syncScroll || state.viewMode !== "both" || state.scrollLocked) return;
+        const sourceLang = container === zhBody ? "zh" : "en";
+        const peerBody = container === zhBody ? enBody : zhBody;
+        const peerLang = container === zhBody ? "en" : "zh";
+        const peerBlocks = state.blockCache.get(peerLang) || [];
+        const sourceBlock = activeBlockForScroll(container);
+        if (!sourceBlock) return;
+        const peerBlock = peerBlocks.find(block => block.dataset.blockIndex === sourceBlock.dataset.blockIndex);
+        if (!peerBlock) return;
+
+        const peerTop = blockTop(peerBody, peerBlock);
+        const sourceViewportOffset =
+          sourceBlock.getBoundingClientRect().top - container.getBoundingClientRect().top;
+        const nextTop = clampScrollTop(peerBody, peerTop - sourceViewportOffset);
+
+        state.lockedContainer = peerBody;
+        peerBody.scrollTop = nextTop;
+        requestAnimationFrame(() => {
+          if (state.lockedContainer === peerBody) state.lockedContainer = null;
+        });
+      }
+
+      function updateActiveBlockFromScroll(container, syncPeer) {
+        const block = activeBlockForScroll(container);
+        if (!block) return;
+        const active = block.dataset.blockIndex;
+        if (state.activeBlockIndex !== active) {
+          state.activeBlockIndex = active;
+          syncActiveBlocks();
+        }
+        if (syncPeer) syncPeerByProgress(container);
+      }
+
+      function scheduleActiveBlockUpdate(container, syncPeer) {
+        if (state.scrollLocked || state.lockedContainer === container) return;
+        cancelAnimationFrame(state.scrollRaf);
+        state.scrollRaf = requestAnimationFrame(() => updateActiveBlockFromScroll(container, syncPeer));
+      }
+
+      function attachLinkedHighlights() {
+        ["zh", "en"].forEach(lang => {
+          const body = lang === "zh" ? zhBody : enBody;
+          (state.blockCache.get(lang) || []).forEach(block => {
+            block.addEventListener("mouseenter", () => setLinkedIndex(block.dataset.blockIndex));
+            block.addEventListener("mouseleave", syncActiveBlocks);
+            block.addEventListener("click", () => scrollPairToIndex(block.dataset.blockIndex, body));
+          });
+        });
+      }
+
+      function buildOutline() {
+        const zhBlocks = state.blockCache.get("zh") || [];
+        const enBlocks = state.blockCache.get("en") || [];
+        const sourceBlocks = zhBlocks.length ? zhBlocks : enBlocks;
+        const headings = sourceBlocks.filter(block => block.dataset.blockKind === "heading");
+        const step = Math.max(1, Math.ceil(sourceBlocks.length / 12));
+        const fallback = sourceBlocks.filter((_, index) => index % step === 0);
+        const nodes = (headings.length ? headings : fallback).slice(0, 18);
+        outlineTitle.textContent = state.selected?.name || "章节导航";
+        outlineMeta.textContent = sourceBlocks.length
+          ? `${sourceBlocks.length} 个阅读区块 · ${zhBlocks.length}/${enBlocks.length} 中英对照`
+          : "当前文档暂无可导航区块。";
+        outlineList.innerHTML = nodes.length
+          ? nodes.map((block, index) => `
+              <button class="outline-chip ${index === 0 ? "is-active" : ""}" type="button" data-jump-index="${block.dataset.blockIndex}">
+                ${escapeHtml(block.dataset.blockLabel || `区块 ${Number(block.dataset.blockIndex) + 1}`)}
+              </button>
+            `).join("")
+          : `<button class="outline-chip is-active" type="button">无可用区块</button>`;
+        syncOutlineState();
+        prepareMotion(outlineRail);
       }
 
       function renderSidebar() {
@@ -994,6 +1494,7 @@
             </section>
           `;
         }).join("");
+        prepareMotion(phaseList);
       }
 
       window.togglePhase = (phase) => {
@@ -1019,27 +1520,37 @@
         zhFileName.textContent = chinese;
         enFileName.textContent = english;
 
-        zhStatus.textContent = "Loading"; zhStatus.className = "pane-status is-loading";
-        enStatus.textContent = "Loading"; enStatus.className = "pane-status is-loading";
+        setPaneStatus(zhStatus, "Loading", "is-loading");
+        setPaneStatus(enStatus, "Loading", "is-loading");
+        zhBody.innerHTML = paneEmpty("读取中文文档", "正在加载中文对照内容...");
+        enBody.innerHTML = paneEmpty("Reading English Reference", "正在加载英文原文...");
 
         try {
           const zhText = await loadFile(chinese);
           zhBody.innerHTML = renderMarkdown(zhText);
-          zhStatus.textContent = "Loaded"; zhStatus.className = "pane-status is-loaded";
+          setPaneStatus(zhStatus, "Loaded", "is-loaded");
         } catch (e) {
-          zhBody.innerHTML = `<div class="empty-state">Error loading file.</div>`;
-          zhStatus.textContent = "Error"; zhStatus.className = "pane-status is-error";
+          zhBody.innerHTML = paneEmpty("文档读取失败", "请检查本地服务和中文文件路径。");
+          setPaneStatus(zhStatus, "Read Error", "is-error");
         }
 
         try {
           const enText = await loadFile(english);
           enBody.innerHTML = renderMarkdown(enText);
-          enStatus.textContent = "Loaded"; enStatus.className = "pane-status is-loaded";
+          setPaneStatus(enStatus, "Loaded", "is-loaded");
         } catch (e) {
-          enBody.innerHTML = `<div class="empty-state"><div><strong>English version coming soon</strong>英文版即将上线 · 翻译整理中</div></div>`;
-          enStatus.textContent = "Unavailable"; enStatus.className = "pane-status";
+          enBody.innerHTML = paneEmpty("English version unavailable", "文档读取失败，请检查英文文件路径。");
+          setPaneStatus(enStatus, "Unavailable");
         }
-        zhBody.scrollTop = enBody.scrollTop = 0;
+        zhBody.scrollTop = 0;
+        enBody.scrollTop = 0;
+        state.activeBlockIndex = "0";
+        refreshBlockCache();
+        equalizePairedBlocks();
+        attachLinkedHighlights();
+        buildOutline();
+        syncActiveBlocks();
+        prepareMotion(document);
       }
 
       function syncUI() {
@@ -1052,7 +1563,10 @@
         layoutSplitBtn.classList.toggle("is-active", state.layoutMode === "split");
         layoutZhFocusBtn.classList.toggle("is-active", state.layoutMode === "zh-focus");
         layoutEnFocusBtn.classList.toggle("is-active", state.layoutMode === "en-focus");
+        syncScrollBtn.classList.toggle("is-active", state.syncScroll);
+        syncScrollBtn.textContent = state.syncScroll ? "同步" : "独立";
         panes.className = `panes layout-${state.layoutMode}`;
+        equalizePairedBlocks();
       }
 
       searchInput.addEventListener("input", e => { state.search = e.target.value; renderSidebar(); });
@@ -1062,8 +1576,22 @@
       layoutSplitBtn.onclick = () => { state.layoutMode = "split"; syncUI(); };
       layoutZhFocusBtn.onclick = () => { state.layoutMode = "zh-focus"; syncUI(); };
       layoutEnFocusBtn.onclick = () => { state.layoutMode = "en-focus"; syncUI(); };
+      syncScrollBtn.onclick = () => { state.syncScroll = !state.syncScroll; syncUI(); };
+      outlineList.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-jump-index]");
+        if (!target) return;
+        scrollPairToIndex(target.dataset.jumpIndex);
+      });
+      zhBody.addEventListener("scroll", () => scheduleActiveBlockUpdate(zhBody, true), { passive: true });
+      enBody.addEventListener("scroll", () => scheduleActiveBlockUpdate(enBody, true), { passive: true });
       toggleCatalogBtn.onclick = floatCatalogBtn.onclick = () => document.body.classList.toggle("catalog-collapsed");
+      window.addEventListener("resize", () => {
+        clearTimeout(state.resizeTimer);
+        state.resizeTimer = window.setTimeout(equalizePairedBlocks, 120);
+      });
 
+      prepareMotion(document);
+      initAmbientSpotlight();
       state.expandedPhases.add("P3");
       selectFile("16");
       syncUI();

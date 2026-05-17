@@ -11,8 +11,8 @@
     />
     <style>
       :root {
-        --bg: #ece6da;
-        --bg-deep: #e0d6c6;
+        --bg: #f7f3ea;
+        --bg-deep: #eee4d6;
         --panel: rgba(253, 249, 242, 0.8);
         --panel-strong: rgba(255, 252, 247, 0.92);
         --text: #241b16;
@@ -31,6 +31,10 @@
         --radius-lg: 22px;
         --radius-md: 16px;
         --sidebar-width: 220px;
+        --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+        --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+        --spot-x: 82%;
+        --spot-y: 14%;
       }
 
       * {
@@ -43,12 +47,16 @@
         min-height: 100%;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         font-family: "Source Han Serif SC", "Iowan Old Style", "Songti SC", serif;
         color: var(--text);
         background:
           radial-gradient(circle at 100% 0%, rgba(169, 79, 45, 0.1), transparent 26%),
-          linear-gradient(135deg, #f1ece3 0%, #ebe3d7 100%);
+          linear-gradient(135deg, #f8f3ea 0%, #eee4d6 100%);
         overflow: hidden;
       }
 
@@ -70,11 +78,55 @@
         opacity: 0.55;
       }
 
+      body::after {
+        content: "";
+        position: fixed;
+        inset: -18vh -18vw;
+        pointer-events: none;
+        z-index: 0;
+        background:
+          radial-gradient(circle at var(--spot-x) var(--spot-y), rgba(199, 161, 72, 0.18), transparent 22rem),
+          radial-gradient(circle at calc(var(--spot-x) - 22%) calc(var(--spot-y) + 18%), rgba(30, 99, 90, 0.10), transparent 18rem);
+        opacity: 0.78;
+        transform: translate3d(0, 0, 0);
+        transition: opacity 260ms var(--ease-out-quart);
+      }
+
+      a:not(.tool-btn) {
+        color: var(--accent);
+        text-decoration: none;
+        background-image: linear-gradient(90deg, currentColor, currentColor);
+        background-position: 0 100%;
+        background-repeat: no-repeat;
+        background-size: 0 1px;
+        transition: color 180ms var(--ease-out-quart), background-size 260ms var(--ease-out-quart);
+      }
+
+      a:not(.tool-btn):hover {
+        color: var(--accent-2);
+        background-size: 100% 1px;
+      }
+
       .app {
         display: grid;
         grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
         height: 100vh;
         position: relative;
+        z-index: 1;
+      }
+
+      .motion-item {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0);
+        transition:
+          opacity 520ms var(--ease-out-quart),
+          transform 520ms var(--ease-out-quart);
+        transition-delay: var(--motion-delay, 0ms);
+      }
+
+      .motion-item.is-visible {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
       }
 
       body.catalog-collapsed .app {
@@ -134,7 +186,7 @@
         font-family: "Didot", "Bodoni 72", "STSong", serif;
         font-size: clamp(24px, 2.2vw, 30px);
         line-height: 0.95;
-        letter-spacing: -0.04em;
+        letter-spacing: 0;
       }
 
       .brand-note {
@@ -217,6 +269,17 @@
         padding: 8px 6px;
         background: rgba(255, 255, 255, 0.68);
         border: 1px solid rgba(53, 43, 33, 0.08);
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
+      }
+
+      .stat-card:hover,
+      .quick-card:hover,
+      .method-card:hover,
+      .signal-card:hover {
+        transform: perspective(900px) rotateX(1.2deg) rotateY(-1.4deg) translateY(-2px);
+        border-color: rgba(169, 79, 45, 0.22);
+        box-shadow: 0 18px 42px rgba(45, 31, 18, 0.12);
       }
 
       .stat-card strong {
@@ -521,6 +584,8 @@
         border-radius: 12px;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.6);
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
       }
 
       .quick-card strong {
@@ -580,13 +645,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        transition: transform 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), background 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
       }
 
       .tool-btn:hover {
-        transform: none;
+        transform: scale(1.025);
         border-color: rgba(169, 79, 45, 0.3);
         background: rgba(255, 255, 255, 0.92);
+        box-shadow: inset 0 0 18px rgba(199, 161, 72, 0.14), 0 10px 22px rgba(45, 31, 18, 0.10);
+      }
+
+      .tool-btn:active {
+        transform: scale(0.985);
       }
 
       .tool-btn.is-active {
@@ -607,6 +677,8 @@
         border-radius: 12px;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(245, 239, 230, 0.78));
         border: 1px solid rgba(53, 43, 33, 0.08);
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
       }
 
       .method-card strong {
@@ -727,14 +799,15 @@
         font: inherit;
         font-size: 11px;
         line-height: 1.2;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+        transition: transform 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), background 180ms var(--ease-out-quart), color 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
       }
 
       .outline-chip:hover {
-        transform: translateY(-1px);
+        transform: translateY(-1px) scale(1.02);
         border-color: rgba(169, 79, 45, 0.28);
         background: rgba(255, 255, 255, 0.92);
         color: var(--text);
+        box-shadow: inset 0 0 16px rgba(199, 161, 72, 0.12), 0 8px 18px rgba(45, 31, 18, 0.08);
       }
 
       .outline-chip.is-active {
@@ -749,6 +822,8 @@
         border: 1px solid var(--line);
         background: rgba(255, 252, 247, 0.68);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+        transition: transform 220ms var(--ease-out-quart), box-shadow 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart);
+        transform-style: preserve-3d;
       }
 
       .signal-card strong {
@@ -816,14 +891,15 @@
         cursor: pointer;
         font: inherit;
         font-size: 12px;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        transition: transform 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), background 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
       }
 
       .jump-btn:hover {
-        transform: translateY(-1px);
+        transform: translateY(-1px) scale(1.025);
         border-color: rgba(169, 79, 45, 0.28);
         background: rgba(255, 255, 255, 0.9);
         color: var(--text);
+        box-shadow: inset 0 0 16px rgba(199, 161, 72, 0.14), 0 10px 22px rgba(45, 31, 18, 0.08);
       }
 
       .sync-indicator {
@@ -930,6 +1006,8 @@
         padding: 22px 24px 34px;
         overflow: auto;
         overscroll-behavior: contain;
+        overflow-anchor: none;
+        scroll-behavior: smooth;
       }
 
       .empty-state {
@@ -959,11 +1037,12 @@
         padding: 14px 14px 2px;
         border: 1px solid transparent;
         border-radius: 18px;
-        transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+        transition: background 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart), box-shadow 180ms var(--ease-out-quart);
       }
 
       .doc-block:hover {
         background: rgba(255, 255, 255, 0.48);
+        transform: translateY(-1px);
       }
 
       .doc-block.is-linked {
@@ -990,7 +1069,7 @@
       .markdown h6 {
         margin: 1.4em 0 0.52em;
         line-height: 1.12;
-        letter-spacing: -0.03em;
+        letter-spacing: 0;
         font-family: "Didot", "Bodoni 72", "Songti SC", serif;
       }
 
@@ -1029,7 +1108,7 @@
       .markdown a {
         color: var(--accent);
         text-decoration: none;
-        border-bottom: 1px solid rgba(169, 79, 45, 0.28);
+        border-bottom: 0;
       }
 
       .markdown code {
@@ -1056,9 +1135,9 @@
 
       .markdown blockquote {
         padding: 14px 18px;
-        border-left: 4px solid rgba(169, 79, 45, 0.36);
+        border: 1px solid rgba(169, 79, 45, 0.18);
         background: rgba(169, 79, 45, 0.06);
-        border-radius: 0 16px 16px 0;
+        border-radius: 16px;
         color: #5a4534;
       }
 
@@ -1095,6 +1174,22 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .motion-item {
+          opacity: 1;
+          transform: none;
         }
       }
 
@@ -1223,7 +1318,7 @@
           <div class="brand-kicker">Prompt Archive</div>
           <h1 class="brand-title">System Prompt Atlas</h1>
           <p class="brand-note">
-            面向当前仓库的阅读器。左侧按公司分层浏览，右侧对照查看中英文内容。
+            面向当前仓库的阅读器。左侧按资料分层浏览，右侧对照查看中英文内容。
           </p>
         </div>
 
@@ -1233,7 +1328,7 @@
             id="searchInput"
             class="search-input"
             type="search"
-            placeholder="搜索公司或文件名"
+            placeholder="搜索资料组或文件名"
             autocomplete="off"
           />
           <div class="filter-row" aria-label="筛选翻译状态">
@@ -1248,7 +1343,7 @@
           <div class="stats">
             <div class="stat-card">
               <strong id="sidebarCompanyCount">0</strong>
-              <span>Companies</span>
+              <span>Groups</span>
             </div>
             <div class="stat-card">
               <strong id="sidebarRecordCount">0</strong>
@@ -1265,7 +1360,7 @@
           </div>
         </section>
 
-        <div class="company-list" id="companyList" aria-label="公司目录树"></div>
+        <div class="company-list" id="companyList" aria-label="资料目录树"></div>
       </aside>
 
       <main class="main">
@@ -1289,7 +1384,7 @@
             <div class="quick-stats">
               <div class="quick-card">
                 <strong id="companyCount">0</strong>
-                <span>Companies</span>
+                <span>Groups</span>
               </div>
               <div class="quick-card">
                 <strong id="recordCount">0</strong>
@@ -1380,9 +1475,9 @@
               <span id="signalBlockMeta">选中文件后显示区块数量与正文规模</span>
             </article>
             <article class="signal-card">
-              <div class="control-label">厂商进度</div>
+              <div class="control-label">资料组进度</div>
               <strong id="signalCoverageTitle">0 / 0</strong>
-              <span id="signalCoverageMeta">当前厂商还没有统计数据</span>
+              <span id="signalCoverageMeta">当前资料组还没有统计数据</span>
               <div class="coverage-track" aria-hidden="true">
                 <div class="coverage-fill" id="signalCoverageFill"></div>
               </div>
@@ -1415,7 +1510,7 @@
                 <div class="empty-state">
                   <div>
                     <strong>选择一个文件</strong>
-                    左侧点击公司并展开目录树，然后挑选一个文档开始校对。
+                    左侧点击资料组并展开目录树，然后挑选一个文档开始校对。
                   </div>
                 </div>
               </div>
@@ -1450,6 +1545,67 @@
 
     <script>
       const MANIFEST = [
+        {
+          company: "BOOKS",
+          records: [
+            {
+              name: "创始人手册 · 01 创业生命周期",
+              english: "founders-playbook/en/01-startup-lifecycle-rebooted.md",
+              chinese: "founders-playbook/zh/01-startup-lifecycle-rebooted.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 02 创始人的含义正在改变",
+              english: "founders-playbook/en/02-founder-role-is-changing.md",
+              chinese: "founders-playbook/zh/02-founder-role-is-changing.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 03 想法阶段",
+              english: "founders-playbook/en/03-idea-stage.md",
+              chinese: "founders-playbook/zh/03-idea-stage.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 04 MVP 阶段",
+              english: "founders-playbook/en/04-mvp-stage.md",
+              chinese: "founders-playbook/zh/04-mvp-stage.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 05 发布阶段",
+              english: "founders-playbook/en/05-launch-stage.md",
+              chinese: "founders-playbook/zh/05-launch-stage.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 06 规模化阶段",
+              english: "founders-playbook/en/06-scale-stage.md",
+              chinese: "founders-playbook/zh/06-scale-stage.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 07 新规则",
+              english: "founders-playbook/en/07-same-job-new-rules.md",
+              chinese: "founders-playbook/zh/07-same-job-new-rules.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            },
+            {
+              name: "创始人手册 · 08 资源",
+              english: "founders-playbook/en/08-resources.md",
+              chinese: "founders-playbook/zh/08-resources.md",
+              type: "book",
+              source: "创始人手册-构建一个AI原生初创公司.pdf"
+            }
+          ]
+        },
         {
           company: "ANTHROPIC",
           records: [
@@ -1587,7 +1743,8 @@
         filterMode: "all",
         activeBlockIndex: "0",
         cache: new Map(),
-        blockCache: new Map()
+        blockCache: new Map(),
+        prefersReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches
       };
 
       const companyList = document.getElementById("companyList");
@@ -1666,6 +1823,50 @@
         protocolWarning.hidden = false;
       }
 
+      const revealObserver = "IntersectionObserver" in window && !state.prefersReducedMotion
+        ? new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                revealObserver.unobserve(entry.target);
+              }
+            }
+          }, { threshold: 0.12 })
+        : null;
+
+      function prepareMotion(scope = document) {
+        const targets = scope.querySelectorAll(
+          ".brand, .search-panel, .meta-panel, .company, .quick-card, .method-card, .signal-card, .outline-bar, .pane, .inspector"
+        );
+        targets.forEach((target, index) => {
+          if (target.dataset.motionReady) return;
+          target.dataset.motionReady = "true";
+          target.style.setProperty("--motion-delay", `${Math.min(index, 10) * 45}ms`);
+          target.classList.add("motion-item");
+          if (revealObserver) {
+            revealObserver.observe(target);
+          } else {
+            target.classList.add("is-visible");
+          }
+        });
+      }
+
+      function initAmbientSpotlight() {
+        if (state.prefersReducedMotion) return;
+        let pending = false;
+        window.addEventListener("pointermove", (event) => {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(() => {
+            pending = false;
+            const x = Math.round((event.clientX / window.innerWidth) * 100);
+            const y = Math.round((event.clientY / window.innerHeight) * 100);
+            document.documentElement.style.setProperty("--spot-x", `${x}%`);
+            document.documentElement.style.setProperty("--spot-y", `${y}%`);
+          });
+        }, { passive: true });
+      }
+
       function encodePath(path) {
         return path
           .split("/")
@@ -1687,6 +1888,7 @@
       }
 
       const COMPANY_MARKS = {
+        BOOKS: { glyph: "BK", color: "#c7a148" },
         ANTHROPIC: { glyph: "A", color: "#9b4f33" },
         BOLT: { glyph: "B", color: "#d18b22" },
         BRAVE: { glyph: "BR", color: "#d75d25" },
@@ -1738,7 +1940,7 @@
               ? "待翻译"
               : "全部";
         filteredSummary.innerHTML = search
-          ? `<strong>${modeLabel}</strong> 下筛出 ${visibleCount} 份文档，覆盖 ${filtered.length} 个公司目录。`
+          ? `<strong>${modeLabel}</strong> 下筛出 ${visibleCount} 份文档，覆盖 ${filtered.length} 个资料组。`
           : `当前查看 <strong>${modeLabel}</strong>，共 ${visibleCount} 份文档。`;
 
         companyList.innerHTML = filtered
@@ -1784,7 +1986,7 @@
                                     <span>${escapeHtml(record.name)}</span>
                                   </div>
                                   <div class="file-meta">
-                                    <span class="pill">${fileType(record.name)}</span>
+                                    <span class="pill">${fileType(record)}</span>
                                     <span class="pill ${record.chinese ? "good" : "warn"}">
                                       ${record.chinese ? "CN Ready" : "EN Only"}
                                     </span>
@@ -1831,9 +2033,12 @@
             }
           });
         }
+        prepareMotion(companyList);
       }
 
-      function fileType(name) {
+      function fileType(record) {
+        const name = typeof record === "string" ? record : record.name;
+        if (typeof record === "object" && record.type === "book") return "Book";
         const lower = name.toLowerCase();
         if (lower.endsWith(".md") || lower.endsWith(".mkd")) return "Markdown";
         if (lower.endsWith(".txt")) return "Text";
@@ -1902,6 +2107,14 @@
 
           if (!line.trim()) {
             i += 1;
+            continue;
+          }
+
+          if (line.trim().startsWith("<!--")) {
+            i += 1;
+            while (i < lines.length && !lines[i - 1].includes("-->")) {
+              i += 1;
+            }
             continue;
           }
 
@@ -2040,7 +2253,8 @@
         const enSummary = summarizeText(enText);
 
         signalDocTitle.textContent = record.name;
-        signalDocMeta.textContent = `${record.company} · ${fileType(record.name)} · ${record.english}`;
+        const sourceMeta = record.source ? ` · 来源 ${record.source}` : "";
+        signalDocMeta.textContent = `${record.company} · ${fileType(record)} · ${record.english}${sourceMeta}`;
         signalTranslationState.textContent = record.chinese ? "已建立中英对照" : "仅英文原文";
         signalTranslationMeta.textContent = record.chinese
           ? `中文 ${zhSummary.chars} 字 / 英文 ${enSummary.chars} 字，适合进入镜像校对。`
@@ -2058,6 +2272,25 @@
       function refreshBlockCache() {
         state.blockCache.set(zhBody, Array.from(zhBody.querySelectorAll("[data-block-index]")));
         state.blockCache.set(enBody, Array.from(enBody.querySelectorAll("[data-block-index]")));
+      }
+
+      function equalizePairedBlocks() {
+        const zhBlocks = state.blockCache.get(zhBody) || [];
+        const enBlocks = state.blockCache.get(enBody) || [];
+        for (const block of [...zhBlocks, ...enBlocks]) {
+          block.style.minHeight = "";
+        }
+        if (state.viewMode !== "both") return;
+        requestAnimationFrame(() => {
+          const enByIndex = new Map(enBlocks.map((block) => [block.dataset.blockIndex, block]));
+          for (const zhBlock of zhBlocks) {
+            const enBlock = enByIndex.get(zhBlock.dataset.blockIndex);
+            if (!enBlock) continue;
+            const height = Math.ceil(Math.max(zhBlock.offsetHeight, enBlock.offsetHeight));
+            zhBlock.style.minHeight = `${height}px`;
+            enBlock.style.minHeight = `${height}px`;
+          }
+        });
       }
 
       function syncActiveBlocks() {
@@ -2083,13 +2316,42 @@
         return block.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
       }
 
+      function syncAnchorOffset(container) {
+        return Math.max(28, Math.min(48, container.clientHeight * 0.06));
+      }
+
+      function blockSpan(container, blocks, block) {
+        const currentTop = blockOffsetTop(container, block);
+        const index = blocks.indexOf(block);
+        const next = blocks[index + 1];
+        const nextTop = next ? blockOffsetTop(container, next) : container.scrollHeight;
+        return Math.max(1, nextTop - currentTop);
+      }
+
+      function activeBlockForScroll(container) {
+        const blocks = state.blockCache.get(container) || [];
+        if (!blocks.length) return null;
+        const anchorTop = container.scrollTop + syncAnchorOffset(container);
+        let active = blocks[0];
+        for (const block of blocks) {
+          if (blockOffsetTop(container, block) <= anchorTop) active = block;
+          else break;
+        }
+        return active;
+      }
+
       function alignBlockToViewport(container, block, viewportOffset) {
-        container.scrollTop = clampScrollTop(container, blockOffsetTop(container, block) - viewportOffset);
+        const top = clampScrollTop(container, blockOffsetTop(container, block) - viewportOffset);
+        container.scrollTo({
+          top,
+          behavior: state.prefersReducedMotion ? "auto" : "smooth"
+        });
       }
 
       function scrollPairToIndex(index, viewportOffset = 72) {
         state.activeBlockIndex = String(index);
         syncScrollBetween.locked = true;
+        clearTimeout(syncScrollBetween.unlockTimer);
         for (const container of [zhBody, enBody]) {
           const target = container.querySelector(`[data-block-index="${index}"]`);
           if (target) {
@@ -2098,9 +2360,9 @@
         }
         syncOutlineState();
         syncActiveBlocks();
-        requestAnimationFrame(() => {
+        syncScrollBetween.unlockTimer = window.setTimeout(() => {
           syncScrollBetween.locked = false;
-        });
+        }, state.prefersReducedMotion ? 40 : 520);
       }
 
       function buildOutline() {
@@ -2138,37 +2400,24 @@
         const sourceBlock = source.querySelector(`[data-block-index="${index}"]`);
         const peer = target.querySelector(`[data-block-index="${index}"]`);
         if (!sourceBlock || !peer) return;
-        syncScrollBetween.locked = true;
         const sourceViewportOffset = sourceBlock.getBoundingClientRect().top - source.getBoundingClientRect().top;
+        syncScrollBetween.lockedContainer = target;
         alignBlockToViewport(target, peer, sourceViewportOffset);
         requestAnimationFrame(() => {
-          syncScrollBetween.locked = false;
+          if (syncScrollBetween.lockedContainer === target) syncScrollBetween.lockedContainer = null;
         });
       }
 
       function updateActiveBlockFromScroll(source, shouldAlignPeer = false) {
-        const blocks = state.blockCache.get(source) || [];
-        if (!blocks.length) return;
-        const sourceTop = source.getBoundingClientRect().top;
-        let active = blocks[0];
-        let best = Number.POSITIVE_INFINITY;
-        for (const block of blocks) {
-          const rect = block.getBoundingClientRect();
-          const distance = Math.abs(rect.top - sourceTop - 40);
-          if (distance < best) {
-            best = distance;
-            active = block;
-          }
-        }
+        const active = activeBlockForScroll(source);
+        if (!active) return;
         const activeIndex = active.dataset.blockIndex;
         if (activeIndex !== state.activeBlockIndex) {
           state.activeBlockIndex = activeIndex;
           syncOutlineState();
           syncActiveBlocks();
-          if (shouldAlignPeer && active.dataset.blockIndex) {
-            alignPeerBlock(source, active.dataset.blockIndex);
-          }
         }
+        if (shouldAlignPeer) syncScrollBetween(source);
       }
 
       function scheduleActiveBlockUpdate(source, shouldAlignPeer = false) {
@@ -2191,7 +2440,10 @@
                 : [zhBody, enBody];
         for (const target of targets) {
           const max = Math.max(0, target.scrollHeight - target.clientHeight);
-          target.scrollTop = max * ratio;
+          target.scrollTo({
+            top: max * ratio,
+            behavior: state.prefersReducedMotion ? "auto" : "smooth"
+          });
         }
       }
 
@@ -2262,16 +2514,33 @@
         }
       }
 
-      function syncScrollBetween(source, target) {
-        return;
+      function syncScrollBetween(source) {
+        if (!state.syncScroll || state.viewMode !== "both" || syncScrollBetween.locked) return;
+        const peer = source === zhBody ? enBody : zhBody;
+        const peerBlocks = state.blockCache.get(peer) || [];
+        const sourceBlock = activeBlockForScroll(source);
+        if (!sourceBlock) return;
+        const peerBlock = peerBlocks.find((block) => block.dataset.blockIndex === sourceBlock.dataset.blockIndex);
+        if (!peerBlock) return;
+
+        const peerTop = blockOffsetTop(peer, peerBlock);
+        const sourceViewportOffset =
+          sourceBlock.getBoundingClientRect().top - source.getBoundingClientRect().top;
+        const peerTopNext = peerTop - sourceViewportOffset;
+
+        syncScrollBetween.lockedContainer = peer;
+        peer.scrollTop = clampScrollTop(peer, peerTopNext);
+        requestAnimationFrame(() => {
+          if (syncScrollBetween.lockedContainer === peer) syncScrollBetween.lockedContainer = null;
+        });
       }
 
       zhBody.addEventListener("scroll", () => {
-        if (syncScrollBetween.locked) return;
+        if (syncScrollBetween.locked || syncScrollBetween.lockedContainer === zhBody) return;
         scheduleActiveBlockUpdate(zhBody, true);
       });
       enBody.addEventListener("scroll", () => {
-        if (syncScrollBetween.locked) return;
+        if (syncScrollBetween.locked || syncScrollBetween.lockedContainer === enBody) return;
         scheduleActiveBlockUpdate(enBody, true);
       });
       async function renderSelection() {
@@ -2319,9 +2588,11 @@
         refreshBlockCache();
         attachLinkedHighlights();
         state.activeBlockIndex = "0";
+        equalizePairedBlocks();
         buildOutline();
         syncActiveBlocks();
         updateSelectionSignals(state.selected, state.lastZhText, state.lastEnText);
+        prepareMotion(document);
         zhBody.scrollTop = 0;
         enBody.scrollTop = 0;
       }
@@ -2348,6 +2619,7 @@
               ? "双栏按段落同步"
               : "双栏同步已关闭"
             : "当前为单栏专注阅读";
+        equalizePairedBlocks();
       }
 
       function syncLayoutMode() {
@@ -2367,6 +2639,7 @@
         } else if (state.layoutMode === "en-focus" && state.viewMode === "both") {
           syncIndicator.textContent = state.syncScroll ? "英文主视图 + 联动滚动" : "英文主视图";
         }
+        equalizePairedBlocks();
       }
 
       function syncScrollButton() {
@@ -2496,13 +2769,21 @@
         }
       });
 
+      window.addEventListener("resize", () => {
+        clearTimeout(state.resizeTimer);
+        state.resizeTimer = window.setTimeout(equalizePairedBlocks, 120);
+      });
+
       state.expandedCompanies.add("OPENAI");
       state.expandedCompanies.add("ANTHROPIC");
+      state.expandedCompanies.add("BOOKS");
       state.selected = {
-        company: "OPENAI",
-        name: "ChatGPT_Personality_v2_Change.md",
-        english: "ChatGPT_Personality_v2_Change.md",
-        chinese: "中文/ChatGPT_Personality_v2_Change.md"
+        company: "BOOKS",
+        name: "创始人手册 · 01 创业生命周期",
+        english: "founders-playbook/en/01-startup-lifecycle-rebooted.md",
+        chinese: "founders-playbook/zh/01-startup-lifecycle-rebooted.md",
+        type: "book",
+        source: "创始人手册-构建一个AI原生初创公司.pdf"
       };
 
       renderSidebar();
@@ -2511,6 +2792,8 @@
       syncScrollButton();
       syncFilterMode();
       syncChromeButtons();
+      prepareMotion(document);
+      initAmbientSpotlight();
       renderSelection();
     </script>
   </body>
